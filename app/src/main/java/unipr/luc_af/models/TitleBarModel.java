@@ -7,13 +7,13 @@ import androidx.lifecycle.ViewModel;
 public class TitleBarModel extends ViewModel {
     private final MutableLiveData<String> titleData = new MutableLiveData<>();
 
+    TitleBarModel() { }
+
     public LiveData<String> getTitle() {
         return titleData;
     }
 
-    TitleBarModel() {
-        titleData.setValue("Testing");
-    }
+    public void setTitle(String title){ titleData.setValue(title);}
 
 
 }

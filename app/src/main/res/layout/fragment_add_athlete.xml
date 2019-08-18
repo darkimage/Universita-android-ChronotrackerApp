@@ -8,7 +8,7 @@
     android:paddingTop="20dp"
     android:paddingRight="20dp"
     android:orientation="vertical"
-    tools:context=".addAthlete">
+    tools:context=".AthleteAdd">
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -39,7 +39,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
@@ -48,7 +47,7 @@
         android:hint="@string/athlete_sport">
 
         <AutoCompleteTextView
-            android:id="@+id/filled_exposed_dropdown"
+            android:id="@+id/athlete_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:editable="false"
@@ -63,7 +62,7 @@
         android:paddingBottom="20dp"
         android:gravity="bottom">
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button"
+            android:id="@+id/add_button"
             android:layout_width="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_height="wrap_content"
