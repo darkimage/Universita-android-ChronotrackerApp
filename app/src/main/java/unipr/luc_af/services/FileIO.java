@@ -1,4 +1,4 @@
-package unipr.luc_af.Services;
+package unipr.luc_af.services;
 
 import android.content.Context;
 

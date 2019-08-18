@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS `activity_type` (
+CREATE TABLE IF NOT EXISTS `activity` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` TEXT(10) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS `activity` (
+CREATE TABLE IF NOT EXISTS `activity_type` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` TEXT(10) NOT NULL,
-  `type` INTEGER,
-  FOREIGN KEY (`type`) REFERENCES `activity_type`(`id`)
+  `activity` INTEGER,
+  FOREIGN KEY (`activity`) REFERENCES `activity`(`id`)
 );

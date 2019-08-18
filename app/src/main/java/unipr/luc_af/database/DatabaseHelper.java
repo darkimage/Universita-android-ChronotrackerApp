@@ -1,11 +1,10 @@
 package unipr.luc_af.database;
 
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
-import java.io.IOException;
-import unipr.luc_af.Services.FileIO;
+
+import unipr.luc_af.services.FileIO;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
@@ -24,6 +23,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try{
             String sqlCreationQuery = FileIO.getInstance().ReadFileFromAssets("db.sql", appContext);
             String[] statements = sqlCreationQuery.split(";");
+            for (String statement: statements) {
+                sqLiteDatabase.execSQL(statement);
+            }
+            String sqlInitQuery = FileIO.getInstance().ReadFileFromAssets("init.sql", appContext);
+            statements = sqlInitQuery.split(";");
             for (String statement: statements) {
                 sqLiteDatabase.execSQL(statement);
             }

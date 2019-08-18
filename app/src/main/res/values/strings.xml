@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Chrono Training Tracker</string>
-    <string name="athlete_name">Athlete Name</string>
+    <string name="athlete_name">Name</string>
+    <string name="athlete_surname">Surname</string>
+    <string name="athlete_sport">Favourite Sport</string>
+    <string name="add">Add</string>
 </resources>
