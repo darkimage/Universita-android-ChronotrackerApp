@@ -23,20 +23,19 @@ import unipr.luc_af.services.Database;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
-import com.google.gson.Gson;
 
 public class AthleteAdd extends Fragment {
-    public String ATHLETE_NAME = "athlete_name";
-    public String ATHLETE_SURNAME = "athlete_surname";
-    public String ATHLETE_ACTIVITY = "athlete_activity";
-    private TitleBarModel titleModel;
-    private AthleteModel athleteModel;
+    private String ATHLETE_NAME = "athlete_name";
+    private String ATHLETE_SURNAME = "athlete_surname";
+    private String ATHLETE_ACTIVITY = "athlete_activity";
+    private TitleBarModel mTitleModel;
+    private AthleteModel mAthleteModel;
 
-    private EditText athleteNameText;
-    private EditText athleteSurnameText;
-    private TextView athleteActivity;
+    private EditText mAthleteNameText;
+    private EditText mAthleteSurnameText;
+    private TextView mAthleteActivity;
 
-    private AwesomeValidation validation; //validator
+    private AwesomeValidation mValidator; //validator
     public AthleteAdd() { }
 
     @Override
@@ -58,35 +57,35 @@ public class AthleteAdd extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //Inizializziamo i reference per degli input del form per la validazione
-        athleteNameText = getView().findViewById(R.id.athlete_name);
-        athleteSurnameText = getView().findViewById(R.id.athlete_surname);
-        athleteActivity = getView().findViewById(R.id.athlete_activity);
+        mAthleteNameText = getView().findViewById(R.id.athlete_name);
+        mAthleteSurnameText = getView().findViewById(R.id.athlete_surname);
+        mAthleteActivity = getView().findViewById(R.id.athlete_activity);
 
         //inizializiomo il validatore
-        validation = new AwesomeValidation(ValidationStyle.UNDERLABEL);
-        validation.setContext(getActivity());
+        mValidator = new AwesomeValidation(ValidationStyle.UNDERLABEL);
+        mValidator.setContext(getActivity());
         //aggiungiamo le regole di validazione
-        validation.addValidation(getActivity(), R.id.athlete_name, "^[A-Za-z\\s]+",R.string.athlete_name_error);
-        validation.addValidation(getActivity(), R.id.athlete_surname, "^[A-Za-z\\s]+",R.string.athlete_surname_error);
-        validation.addValidation(getActivity(), R.id.athlete_activity, "^[A-Za-z\\s]+",R.string.athlete_activity_error);
+        mValidator.addValidation(getActivity(), R.id.athlete_name, "^[A-Za-z\\s]+",R.string.athlete_name_error);
+        mValidator.addValidation(getActivity(), R.id.athlete_surname, "^[A-Za-z\\s]+",R.string.athlete_surname_error);
+        mValidator.addValidation(getActivity(), R.id.athlete_activity, "^[A-Za-z\\s]+",R.string.athlete_activity_error);
     }
 
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequence(ATHLETE_NAME, athleteNameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_SURNAME, athleteSurnameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_ACTIVITY, athleteActivity.getText());
+        savedInstanceState.putCharSequence(ATHLETE_NAME, mAthleteNameText.getText());
+        savedInstanceState.putCharSequence(ATHLETE_SURNAME, mAthleteSurnameText.getText());
+        savedInstanceState.putCharSequence(ATHLETE_ACTIVITY, mAthleteActivity.getText());
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if(savedInstanceState != null) {
-            athleteNameText.setText(savedInstanceState.getCharSequence(ATHLETE_NAME));
-            athleteSurnameText.setText(savedInstanceState.getCharSequence(ATHLETE_SURNAME));
-            athleteActivity.setText(savedInstanceState.getCharSequence(ATHLETE_ACTIVITY));
+            mAthleteNameText.setText(savedInstanceState.getCharSequence(ATHLETE_NAME));
+            mAthleteSurnameText.setText(savedInstanceState.getCharSequence(ATHLETE_SURNAME));
+            mAthleteActivity.setText(savedInstanceState.getCharSequence(ATHLETE_ACTIVITY));
         }
     }
 
@@ -94,10 +93,10 @@ public class AthleteAdd extends Fragment {
     public synchronized void onStart() {
         super.onStart();
         //Aggiorniamo la actionbar title
-        titleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
-        titleModel.setTitle(getActivity().getResources().getString(R.string.add_athlete));
+        mTitleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
+        mTitleModel.setTitle(getActivity().getResources().getString(R.string.add_athlete));
 
-        athleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
+        mAthleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
 
         //Ricaviamo i dati per popolare il dropdown menu dal database
         DatabaseResult activitiesResult = (Cursor cursor) -> setDropdownOptions(cursor);
@@ -118,17 +117,17 @@ public class AthleteAdd extends Fragment {
     }
 
     private void Commit(){
-        if(validation.validate()){
+        if(mValidator.validate()){
             DatabaseResult activityResult = (cursor) -> {
                 if(cursor.moveToFirst()) {
-                    Athlete athlete = new Athlete(
-                            athleteNameText.getText().toString(),
-                            athleteSurnameText.getText().toString(),
+                    Athlete athlete = new Athlete(new Long(-1),
+                            mAthleteNameText.getText().toString(),
+                            mAthleteSurnameText.getText().toString(),
                             cursor.getLong(0));
-                    athleteModel.addAthlete(athlete);
+                    mAthleteModel.addAthlete(athlete);
                 }
             };
-            Database.getInstance().getActivityIdFromName(athleteActivity.getText().toString(), activityResult);
+            Database.getInstance().getActivityIdFromName(mAthleteActivity.getText().toString(), activityResult);
         }
     }
 }

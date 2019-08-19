@@ -10,6 +10,8 @@
     <string name="athlete_surname_error">Add a valid surname</string>
     <string name="athlete_activity_error">Select a valid sport from the list</string>
 
+    <string name="athlete_list">Athlete list</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

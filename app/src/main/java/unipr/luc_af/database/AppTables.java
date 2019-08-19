@@ -1,6 +1,7 @@
 package unipr.luc_af.database;
 
 public enum AppTables {
+    TABLE_ID_COL("id"),
     ACTIVITY_TABLE("activity"),
     ACTIVITY_TABLE_COL_0("name"),
     ACTIVITY_TYPE_TABLE("activity_type"),

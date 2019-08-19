@@ -50,6 +50,29 @@ public class Database {
         return db.insertOrThrow(AppTables.ACTIVITY_TYPE_TABLE.getName(), null, values);
     }
 
+    public void getActivities(DatabaseResult result){
+        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
+            @Override
+            protected Cursor doInBackground(Void... voids) {
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
+                        new String[]{
+                                AppTables.TABLE_ID_COL.getName(),
+                                AppTables.ACTIVITY_TABLE_COL_0.getName()},
+                        null,
+                        null,
+                        null,
+                        null,
+                        null);
+                return queryCursor;
+            }
+
+            @Override
+            protected void onPostExecute(Cursor cursor) { result.OnResult(cursor); }
+        };
+        task.execute();
+    }
+
     public void getActivityNames(DatabaseResult result){
         //Usiamo la classe helper(wrapper) AsyncTask per eseguire la query del database su un trhead separato ma
         //aggiorniamo la UI nel thread corretto quindi il metodo OnResult della classe DatabaseResult e' eseguito nell' UI thread
@@ -58,7 +81,7 @@ public class Database {
             protected Cursor doInBackground(Void... voids) {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
-                        new String[]{"name"},
+                        new String[]{AppTables.ACTIVITY_TABLE_COL_0.getName()},
                         null,
                         null,
                         null,
@@ -79,7 +102,7 @@ public class Database {
             protected Cursor doInBackground(Void... voids) {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
-                        new String[]{"id"},
+                        new String[]{AppTables.TABLE_ID_COL.getName()},
                         "name = \"" + name + "\"",
                         null,
                         null,
@@ -103,10 +126,18 @@ public class Database {
             protected Long doInBackground(Void... voids) {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(AppTables.ATHLETE_TABLE_COL_0.getName(), athlete.name);
-                values.put(AppTables.ATHLETE_TABLE_COL_1.getName(), athlete.surname);
-                values.put(AppTables.ATHLETE_TABLE_COL_2.getName(), athlete.activityReference);
-                return db.insert(AppTables.ATHLETE_TABLE.getName(),null,values);
+                if(athlete.id == -1) {
+                    values.put(AppTables.ATHLETE_TABLE_COL_0.getName(), athlete.name);
+                    values.put(AppTables.ATHLETE_TABLE_COL_1.getName(), athlete.surname);
+                    values.put(AppTables.ATHLETE_TABLE_COL_2.getName(), athlete.activityReference);
+                }else{
+
+                    values.put(AppTables.TABLE_ID_COL.getName(), athlete.id);
+                    values.put(AppTables.ATHLETE_TABLE_COL_0.getName(), athlete.name);
+                    values.put(AppTables.ATHLETE_TABLE_COL_1.getName(), athlete.surname);
+                    values.put(AppTables.ATHLETE_TABLE_COL_2.getName(), athlete.activityReference);
+                }
+                return db.insert(AppTables.ATHLETE_TABLE.getName(), null, values);
             }
 
             @Override
@@ -116,4 +147,31 @@ public class Database {
         };
         task.execute();
     }
+
+    public void getAthletes(DatabaseResult result){
+        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
+            @Override
+            protected Cursor doInBackground(Void... voids) {
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Cursor queryCursor = db.query(AppTables.ATHLETE_TABLE.getName(),
+                        new String[]{
+                                AppTables.TABLE_ID_COL.getName(),
+                                AppTables.ATHLETE_TABLE_COL_0.getName(),
+                                AppTables.ATHLETE_TABLE_COL_1.getName(),
+                                AppTables.ATHLETE_TABLE_COL_2.getName()},
+                        null,
+                        null,
+                        null,
+                        null,
+                        null);
+                return queryCursor;
+            }
+
+            @Override
+            protected void onPostExecute(Cursor cursor) { result.OnResult(cursor); }
+        };
+        task.execute();
+    }
+
+
 }

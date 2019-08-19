@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="200"
+    android:exitFadeDuration="300">
+    <item
+        android:state_focused="true"
+        android:state_pressed="false"
+        android:drawable="@color/highlightColor" />
+    <item
+        android:state_focused="true"
+        android:state_pressed="true"
+        android:drawable="@color/primaryColor" />
+    <item
+        android:state_focused="false"
+        android:state_pressed="true"
+        android:drawable="@color/highlightColor" />
+    <item android:drawable="@color/backgroundColor" />
+</selector>
