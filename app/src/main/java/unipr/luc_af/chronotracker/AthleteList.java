@@ -3,6 +3,7 @@ package unipr.luc_af.chronotracker;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,6 +22,8 @@ import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Database;
 
 public class AthleteList extends Fragment {
+    private String SCROLL_POS = "scroll_pos";
+    private int mScrollPos = 0;
     private RecyclerView mAtheleteList;
     private FloatingActionButton mAddAthlete;
     private LinearLayoutManager mLayoutManager;
@@ -41,16 +44,17 @@ public class AthleteList extends Fragment {
 
         DatabaseResult athletesResult = (cursor)-> {
             Athlete[] athletes = getAthleteList(cursor);
-            mAtheleteList.setAdapter(new AthleteAdapter(athletes));
+            mAtheleteList.setAdapter(new AthleteAdapter(getActivity(),athletes, (v,athlete) -> onItemClick(v,athlete)));
             mAtheleteList.invalidate();
         };
         Database.getInstance().getAthletes(athletesResult);
-        mAtheleteList.setAdapter(new AthleteAdapter());
+        mAtheleteList.setAdapter(new AthleteAdapter(getActivity()));
 
         mAddAthlete = view.findViewById(R.id.add_fab);
         mAddAthlete.setOnClickListener((v) -> goToAddAthlete());
         return view;
     }
+
 
     public Athlete[] getAthleteList(Cursor cursor){
         cursor.moveToFirst();
@@ -63,20 +67,36 @@ public class AthleteList extends Fragment {
                     cursor.getLong(3));
             cursor.moveToNext();
         }
+        mAtheleteList.scrollToPosition(mScrollPos);
         return athletes;
     }
 
-    public void goToAddAthlete(){
+    private void onItemClick(View view, Athlete athlete){
+        mScrollPos = mLayoutManager.findFirstVisibleItemPosition();
         getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(
-                        R.anim.horizontal_in_left,
-                        R.anim.horizontal_out_left,
-                        R.anim.horizontal_in,
-                        R.anim.horizontal_out)
-                .replace(R.id.frameLayout,new AthleteAdd())
-                .addToBackStack(null)
-                .commit();
+            .beginTransaction()
+            .setCustomAnimations(
+                    R.anim.horizontal_in_left,
+                    R.anim.horizontal_out_left,
+                    R.anim.horizontal_in,
+                    R.anim.horizontal_out)
+            .replace(R.id.root,new AthleteActivities())
+            .addToBackStack(null)
+            .commit();
+    }
+
+    private void goToAddAthlete(){
+        mScrollPos = mLayoutManager.findFirstVisibleItemPosition();
+        getActivity().getSupportFragmentManager()
+            .beginTransaction()
+            .setCustomAnimations(
+                    R.anim.horizontal_in_left,
+                    R.anim.horizontal_out_left,
+                    R.anim.horizontal_in,
+                    R.anim.horizontal_out)
+            .replace(R.id.root,new AthleteAdd())
+            .addToBackStack(null)
+            .commit();
     }
 
     @Override
@@ -84,6 +104,19 @@ public class AthleteList extends Fragment {
         super.onStart();
         mTitleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
         mTitleModel.setTitle(getActivity().getString(R.string.athlete_list));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(SCROLL_POS, mScrollPos);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if(savedInstanceState != null) {
+            mScrollPos = savedInstanceState.getInt(SCROLL_POS);
+        }
     }
 
 }

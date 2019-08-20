@@ -117,7 +117,7 @@ public class Database {
                 result.OnResult(cursor);
             }
         };
-        task.execute();
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void addAthelete(Athlete athlete, DatabaseInsert result){

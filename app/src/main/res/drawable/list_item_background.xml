@@ -6,14 +6,14 @@
     <item
         android:state_focused="true"
         android:state_pressed="false"
-        android:drawable="@color/highlightColor" />
+        android:drawable="@drawable/list_item_selection" />
     <item
         android:state_focused="true"
         android:state_pressed="true"
-        android:drawable="@color/primaryColor" />
+        android:drawable="@drawable/list_item_selection" />
     <item
         android:state_focused="false"
         android:state_pressed="true"
-        android:drawable="@color/highlightColor" />
+        android:drawable="@drawable/list_item_selection" />
     <item android:drawable="@color/backgroundColor" />
 </selector>

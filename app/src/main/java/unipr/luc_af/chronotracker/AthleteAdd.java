@@ -72,24 +72,6 @@ public class AthleteAdd extends Fragment {
 
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequence(ATHLETE_NAME, mAthleteNameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_SURNAME, mAthleteSurnameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_ACTIVITY, mAthleteActivity.getText());
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if(savedInstanceState != null) {
-            mAthleteNameText.setText(savedInstanceState.getCharSequence(ATHLETE_NAME));
-            mAthleteSurnameText.setText(savedInstanceState.getCharSequence(ATHLETE_SURNAME));
-            mAthleteActivity.setText(savedInstanceState.getCharSequence(ATHLETE_ACTIVITY));
-        }
-    }
-
-    @Override
     public synchronized void onStart() {
         super.onStart();
         //Aggiorniamo la actionbar title
@@ -128,6 +110,24 @@ public class AthleteAdd extends Fragment {
                 }
             };
             Database.getInstance().getActivityIdFromName(mAthleteActivity.getText().toString(), activityResult);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putCharSequence(ATHLETE_NAME, mAthleteNameText.getText());
+        savedInstanceState.putCharSequence(ATHLETE_SURNAME, mAthleteSurnameText.getText());
+        savedInstanceState.putCharSequence(ATHLETE_ACTIVITY, mAthleteActivity.getText());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if(savedInstanceState != null) {
+            mAthleteNameText.setText(savedInstanceState.getCharSequence(ATHLETE_NAME));
+            mAthleteSurnameText.setText(savedInstanceState.getCharSequence(ATHLETE_SURNAME));
+            mAthleteActivity.setText(savedInstanceState.getCharSequence(ATHLETE_ACTIVITY));
         }
     }
 }

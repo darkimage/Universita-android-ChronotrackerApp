@@ -4,13 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
+
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Database;
-
-import static androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE;
+import unipr.luc_af.services.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         //Aggiungiamo il fragment AthleteList
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.frameLayout, new AthleteList()).commit();
+                .replace(R.id.root, new AthleteList()).commit();
 
         //Action bar update observer usando un viewmodel
         mTitleModel = new ViewModelProvider(this).get(TitleBarModel.class);
@@ -46,9 +48,16 @@ public class MainActivity extends AppCompatActivity {
                             R.anim.horizontal_out_left,
                             R.anim.horizontal_in,
                             R.anim.horizontal_out)
-                        .replace(R.id.frameLayout, new AthleteList())
+                        .replace(R.id.root, new AthleteList())
                         .addToBackStack(null)
                         .commit();
+                    View contextView = findViewById(R.id.root_coordinator_layout);
+                    Utils.getInstance().executeWithDelay(1000,() ->
+                        Snackbar.make(contextView,
+                                getString(R.string.athlete) + " " + athlete.name + " " + athlete.surname + " " + getString(R.string.added),
+                                Snackbar.LENGTH_LONG)
+                                .show()
+                    );
                 }
             });
         };
