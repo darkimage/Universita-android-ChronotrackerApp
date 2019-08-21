@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -20,6 +21,7 @@ import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Database;
+import unipr.luc_af.services.Utils;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
@@ -48,6 +50,7 @@ public class AthleteAdd extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View fragView = inflater.inflate(R.layout.fragment_add_athlete, container, false);
+        Utils.getInstance().setToolBarNavigation((AppCompatActivity)getActivity());
         //Add the click listener to the button
         fragView.findViewById(R.id.add_button).setOnClickListener((view) -> Commit());
         return fragView;

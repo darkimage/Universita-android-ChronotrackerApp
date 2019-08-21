@@ -1,4 +1,5 @@
 package unipr.luc_af.services;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -6,7 +7,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import unipr.luc_af.classes.Athlete;
+import unipr.luc_af.classes.NoLeakAsyncTask;
 import unipr.luc_af.database.DatabaseHelper;
 import unipr.luc_af.database.AppTables;
 import unipr.luc_af.database.interfaces.DatabaseInsert;
@@ -14,6 +19,7 @@ import unipr.luc_af.database.interfaces.DatabaseResult;
 
 public class Database {
     private static Database instance = null;
+    private Activity mContext;
     private DatabaseHelper dbHelper;
     private Database () { }
 
@@ -28,7 +34,8 @@ public class Database {
      * altra chiamata a metodi di questa classe
      * @param context la Activity di riferimento
      */
-    public void setContext(Context context) {
+    public void setContext(Activity context) {
+        mContext = context;
         dbHelper = new DatabaseHelper(context);
         dbHelper.getWritableDatabase();
     }
@@ -96,34 +103,34 @@ public class Database {
         task.execute();
     }
 
-    public void getActivityIdFromName(String name,DatabaseResult result){
-        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
-            @Override
-            protected Cursor doInBackground(Void... voids) {
+    public void getActivityIdFromName(String name, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... in) -> {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Utils utils = Utils.getInstance();
                 Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
                         new String[]{AppTables.TABLE_ID_COL.getName()},
-                        "name = \"" + name + "\"",
+                        utils.concatString(" ",
+                                AppTables.ACTIVITY_TABLE_COL_0.getName(),
+                                "=",
+                                "\"" + name + "\""),
                         null,
                         null,
                         null,
                         null,
                         "1");
                 return queryCursor;
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) {
-                result.OnResult(cursor);
-            }
-        };
+            },
+            (cursor) -> { result.OnResult(cursor); }
+        );
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void addAthelete(Athlete athlete, DatabaseInsert result){
-        AsyncTask<Void,Void,Long> task = new AsyncTask<Void, Void, Long>() {
-            @Override
-            protected Long doInBackground(Void... voids) {
+    public void addAthlete(Athlete athlete, DatabaseInsert result){
+        NoLeakAsyncTask<Void,Void,Long> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... in)-> {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 if(athlete.id == -1) {
@@ -138,20 +145,16 @@ public class Database {
                     values.put(AppTables.ATHLETE_TABLE_COL_2.getName(), athlete.activityReference);
                 }
                 return db.insert(AppTables.ATHLETE_TABLE.getName(), null, values);
-            }
-
-            @Override
-            protected void onPostExecute(Long id) {
-                result.OnInsert(id);
-            }
-        };
+            },
+            (id) ->{ result.OnInsert(id); }
+        );
         task.execute();
     }
 
     public void getAthletes(DatabaseResult result){
-        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
-            @Override
-            protected Cursor doInBackground(Void... voids) {
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... in) ->{
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 Cursor queryCursor = db.query(AppTables.ATHLETE_TABLE.getName(),
                         new String[]{
@@ -165,13 +168,39 @@ public class Database {
                         null,
                         null);
                 return queryCursor;
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) { result.OnResult(cursor); }
-        };
-        task.execute();
+                },
+            (cursor) -> {result.OnResult(cursor);});
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-
+    public void getActivitiesOfDay(Calendar date, Athlete athlete, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(mContext,
+            (Void... in) ->{
+                Calendar endDate = (Calendar) date.clone();
+                endDate.add(Calendar.DAY_OF_MONTH,1);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Utils utils = Utils.getInstance();
+                Cursor queryCursor = db.query(AppTables.SESSION_TABLE.getName(),
+                        new String[0],
+                        utils.concatString( " ",
+                                AppTables.SESSION_TABLE_COL_3.getName(),
+                                "BETWEEN",
+                                String.valueOf(date.getTime().getTime()),
+                                "AND",
+                                String.valueOf(endDate.getTime().getTime()),
+                                "AND",
+                                AppTables.SESSION_TABLE_COL_0.getName(),
+                                "=",
+                                athlete.id.toString()
+                                ),
+                        null,
+                        null,
+                        null,
+                        null,
+                        "1");
+                return queryCursor;
+            },
+            (cursor) -> {result.OnResult(cursor);});
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 }

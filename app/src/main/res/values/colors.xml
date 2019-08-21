@@ -11,4 +11,6 @@
     <color name="secondaryTextColor">#000000</color>
     <color name="backgroundColor">#ffffff</color>
     <color name="highlightColor">#C0D7F0</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="dialogHeaderColor">#DE000000</color>
 </resources>

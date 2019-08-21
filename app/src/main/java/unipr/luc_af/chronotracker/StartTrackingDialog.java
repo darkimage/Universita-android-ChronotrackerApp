@@ -1,31 +1,29 @@
 package unipr.luc_af.chronotracker;
 
-
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import unipr.luc_af.services.Utils;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class StartTracking extends Fragment {
+public class StartTrackingDialog extends DialogFragment {
 
 
-    public StartTracking() {
+    public StartTrackingDialog() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_start_tracking, container, false);
+        Utils.getInstance().setToolBarNavigation((AppCompatActivity)getActivity());
+        return inflater.inflate(R.layout.dialog_start_tracking, container, false);
     }
 
 }

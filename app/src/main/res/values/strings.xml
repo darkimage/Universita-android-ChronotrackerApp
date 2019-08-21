@@ -5,6 +5,7 @@
     <string name="athlete_sport">Favourite Sport</string>
     <string name="add">Add</string>
     <string name="add_athlete">Add new athlete</string>
+    <string name="athlete_activities">activities</string>
 
     <string name="athlete_name_error">Add a valid name</string>
     <string name="athlete_surname_error">Add a valid surname</string>
@@ -15,4 +16,14 @@
     <string name="athlete_current">Current athlete:</string>
     <string name="athlete">Athlete</string>
     <string name="added">added</string>
+    <string name="export_all_activities">Export all</string>
+    <string name="export_current_day_activities">Export current day</string>
+    <string name="lap">Lap</string>
+    <string name="activity_item_laps">Laps:</string>
+    <string name="stop">Stop</string>
+    <string name="no_athlete_records">No athletes profiles</string>
+    <string name="no_activities_records">No activities for current day</string>
+    <string name="activity_item_elapsed_time">Duration:</string>
+    <string name="start_tracking_header">Start new tracking</string>
+    <string name="select_activity">Select a sport</string>
 </resources>

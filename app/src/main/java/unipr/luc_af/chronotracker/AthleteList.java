@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,43 +13,54 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import unipr.luc_af.adapters.AthleteAdapter;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.database.interfaces.DatabaseResult;
+import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Database;
+import unipr.luc_af.services.Utils;
 
 public class AthleteList extends Fragment {
     private String SCROLL_POS = "scroll_pos";
     private int mScrollPos = 0;
-    private RecyclerView mAtheleteList;
+    private RecyclerView mAthleteList;
     private FloatingActionButton mAddAthlete;
     private LinearLayoutManager mLayoutManager;
     private TitleBarModel mTitleModel;
+    private AthleteModel mAthleteModel;
     public AthleteList() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.list_layout, container, false);
-        mAtheleteList = view.findViewById(R.id.recycle_list);
+        View view = inflater.inflate(R.layout.athletes_list_layout, container, false);
+        mAthleteList = view.findViewById(R.id.recycle_list);
         // Performance extra se gli oggetti non cambiano il layout della RecycleView
-        mAtheleteList.setHasFixedSize(true);
+        mAthleteList.setHasFixedSize(true);
+        Utils.getInstance().setToolBarNavigation((AppCompatActivity)getActivity());
 
         // Aggiungiamo un standard linearlayout manager
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mAtheleteList.setLayoutManager(mLayoutManager);
+        mAthleteList.setLayoutManager(mLayoutManager);
 
         DatabaseResult athletesResult = (cursor)-> {
             Athlete[] athletes = getAthleteList(cursor);
-            mAtheleteList.setAdapter(new AthleteAdapter(getActivity(),athletes, (v,athlete) -> onItemClick(v,athlete)));
-            mAtheleteList.invalidate();
+            mAthleteList.setAdapter(new AthleteAdapter(athletes, (v, athlete) -> onItemClick(v,athlete)));
+            mAthleteList.invalidate();
+            if(athletes.length == 0){
+                mAthleteList.setVisibility(View.GONE);
+                TextView emptyMessage = view.findViewById(R.id.no_data_message);
+                emptyMessage.setText(getActivity().getText(R.string.no_athlete_records));
+                emptyMessage.setVisibility(View.VISIBLE);
+            }
         };
         Database.getInstance().getAthletes(athletesResult);
-        mAtheleteList.setAdapter(new AthleteAdapter(getActivity()));
+        mAthleteList.setAdapter(new AthleteAdapter());
 
         mAddAthlete = view.findViewById(R.id.add_fab);
         mAddAthlete.setOnClickListener((v) -> goToAddAthlete());
@@ -67,12 +79,13 @@ public class AthleteList extends Fragment {
                     cursor.getLong(3));
             cursor.moveToNext();
         }
-        mAtheleteList.scrollToPosition(mScrollPos);
+        mAthleteList.scrollToPosition(mScrollPos);
         return athletes;
     }
 
     private void onItemClick(View view, Athlete athlete){
         mScrollPos = mLayoutManager.findFirstVisibleItemPosition();
+        mAthleteModel.selectAthlete(athlete);
         getActivity().getSupportFragmentManager()
             .beginTransaction()
             .setCustomAnimations(
@@ -102,6 +115,7 @@ public class AthleteList extends Fragment {
     @Override
     public synchronized void onStart() {
         super.onStart();
+        mAthleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
         mTitleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
         mTitleModel.setTitle(getActivity().getString(R.string.athlete_list));
     }

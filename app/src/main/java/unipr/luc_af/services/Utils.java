@@ -1,8 +1,10 @@
 package unipr.luc_af.services;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
-import java.util.concurrent.TimeUnit;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 public class Utils {
     private static Utils instance = null;
@@ -36,5 +38,26 @@ public class Utils {
 
     public interface DelayedTask{
         void AfterDelay();
+    }
+
+    public String concatString(String delimiter, String ... strings){
+        String res = "";
+        for (int i = 0; i < strings.length; i++) {
+            res += strings[i];
+            if(i < strings.length-1){
+                res += delimiter;
+            }
+        }
+        return res;
+    }
+
+    public void setToolBarNavigation(AppCompatActivity fragment){
+        if(fragment.getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            fragment.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            fragment.getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }else{
+            fragment.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            fragment.getSupportActionBar().setDisplayShowHomeEnabled(false);
+        }
     }
 }
