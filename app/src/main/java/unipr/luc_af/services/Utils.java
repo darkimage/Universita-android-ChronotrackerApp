@@ -1,10 +1,7 @@
 package unipr.luc_af.services;
 
-import android.content.Context;
 import android.os.AsyncTask;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 public class Utils {
     private static Utils instance = null;

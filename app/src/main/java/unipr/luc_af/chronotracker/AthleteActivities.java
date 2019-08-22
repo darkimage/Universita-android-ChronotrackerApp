@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,9 +22,11 @@ import android.widget.TextView;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import unipr.luc_af.adapters.ActivitiesAdapter;
+import unipr.luc_af.adapters.ActivitySessionAdapter;
 import unipr.luc_af.classes.Athlete;
+import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.database.interfaces.DatabaseResult;
+import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
@@ -61,7 +64,7 @@ public class AthleteActivities extends Fragment {
         mActivitiesList = view.findViewById(R.id.recycle_list_activities);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mActivitiesList.setLayoutManager(mLayoutManager);
-        mActivitiesList.setAdapter(new ActivitiesAdapter());
+        mActivitiesList.setAdapter(new ActivitySessionAdapter());
 
         return view;
     }

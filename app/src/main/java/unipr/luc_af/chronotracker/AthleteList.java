@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -86,30 +87,32 @@ public class AthleteList extends Fragment {
     private void onItemClick(View view, Athlete athlete){
         mScrollPos = mLayoutManager.findFirstVisibleItemPosition();
         mAthleteModel.selectAthlete(athlete);
-        getActivity().getSupportFragmentManager()
-            .beginTransaction()
+        FragmentManager manager = getActivity().getSupportFragmentManager();
+        manager.beginTransaction()
             .setCustomAnimations(
                     R.anim.horizontal_in_left,
                     R.anim.horizontal_out_left,
                     R.anim.horizontal_in,
                     R.anim.horizontal_out)
             .replace(R.id.root,new AthleteActivities())
-            .addToBackStack(null)
+            .addToBackStack("athlete_activities")
             .commit();
+        manager.executePendingTransactions();
     }
 
     private void goToAddAthlete(){
         mScrollPos = mLayoutManager.findFirstVisibleItemPosition();
-        getActivity().getSupportFragmentManager()
-            .beginTransaction()
+        FragmentManager manger = getActivity().getSupportFragmentManager();
+        manger.beginTransaction()
             .setCustomAnimations(
                     R.anim.horizontal_in_left,
                     R.anim.horizontal_out_left,
                     R.anim.horizontal_in,
                     R.anim.horizontal_out)
-            .replace(R.id.root,new AthleteAdd())
-            .addToBackStack(null)
+            .replace(R.id.root,new AthleteAdd(), "add_athlete")
+            .addToBackStack("add_athlete")
             .commit();
+        manger.executePendingTransactions();
     }
 
     @Override
@@ -132,5 +135,7 @@ public class AthleteList extends Fragment {
             mScrollPos = savedInstanceState.getInt(SCROLL_POS);
         }
     }
+
+
 
 }

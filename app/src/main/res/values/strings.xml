@@ -4,6 +4,8 @@
     <string name="athlete_surname">Surname</string>
     <string name="athlete_sport">Favourite Sport</string>
     <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">Start</string>
     <string name="add_athlete">Add new athlete</string>
     <string name="athlete_activities">activities</string>
 
@@ -25,5 +27,8 @@
     <string name="no_activities_records">No activities for current day</string>
     <string name="activity_item_elapsed_time">Duration:</string>
     <string name="start_tracking_header">Start new tracking</string>
+    <string name="start_tracking_speciality">Sport speciality</string>
+    <string name="start_tracking_no_specialities">No specialities</string>
     <string name="select_activity">Select a sport</string>
+
 </resources>

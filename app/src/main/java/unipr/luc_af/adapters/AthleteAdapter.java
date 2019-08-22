@@ -16,11 +16,9 @@ import unipr.luc_af.services.Database;
 
 public class AthleteAdapter extends RecyclerView.Adapter<ListViewHolder> {
     private AthleteListItemClick mItemClick = null;
-    private Athlete[] mAthleteList;
+    private Athlete[] mAthleteList =new Athlete[0];
 
-    public AthleteAdapter(){
-        mAthleteList = new Athlete[0];
-    }
+    public AthleteAdapter(){ }
 
     public AthleteAdapter(Athlete[] athletes, AthleteListItemClick itemClick){
         mItemClick = itemClick;
@@ -36,8 +34,7 @@ public class AthleteAdapter extends RecyclerView.Adapter<ListViewHolder> {
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View athleteView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.athelete_list_item,parent,false);
-        ListViewHolder viewHolder = new ListViewHolder(athleteView);
-        return viewHolder;
+        return new ListViewHolder(athleteView);
     }
 
     public void onAthleteClick(View view, Athlete athlete){

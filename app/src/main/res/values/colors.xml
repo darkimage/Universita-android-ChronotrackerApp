@@ -5,10 +5,11 @@
     <color name="primaryDarkColor">#004ba0</color>
     <color name="secondaryColor">#ff4081</color>
     <color name="secondaryLightColor">#ff79b0</color>
+    <color name="secondaryDisabledColor">#4FFF79B0</color>
     <color name="secondaryDarkColor">#c60055</color>
     <color name="primaryTextColor">#fafafa</color>
-    <color name="primaryDisabledColor">#838383</color>
-    <color name="secondaryTextColor">#000000</color>
+    <color name="primaryDisabledColor">#8F838383</color>
+    <color name="secondaryTextColor">#F3FFFFFF</color>
     <color name="backgroundColor">#ffffff</color>
     <color name="highlightColor">#C0D7F0</color>
     <color name="transparent">#00FFFFFF</color>

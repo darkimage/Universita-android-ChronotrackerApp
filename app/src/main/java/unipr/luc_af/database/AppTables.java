@@ -6,7 +6,7 @@ public enum AppTables {
     ACTIVITY_TABLE_COL_0("name"),
     ACTIVITY_TYPE_TABLE("activity_type"),
     ACTIVITY_TYPE_TABLE_COL_0("name"),
-    ACTIVITY_TYPE_TABLE_COL_1("type"),
+    ACTIVITY_TYPE_TABLE_COL_1("activity"),
     ATHLETE_TABLE("athlete"),
     ATHLETE_TABLE_COL_0("name"),
     ATHLETE_TABLE_COL_1("surname"),

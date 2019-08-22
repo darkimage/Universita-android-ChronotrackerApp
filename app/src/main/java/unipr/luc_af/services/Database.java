@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import java.util.Calendar;
 import java.util.Date;
 
+import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.NoLeakAsyncTask;
 import unipr.luc_af.database.DatabaseHelper;
@@ -57,10 +58,36 @@ public class Database {
         return db.insertOrThrow(AppTables.ACTIVITY_TYPE_TABLE.getName(), null, values);
     }
 
+    public void getActivitiesTypesOfActivity(ActivitySport activity, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... voids)-> {
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                Utils utils = Utils.getInstance();
+                Cursor queryCursor = db.query(AppTables.ACTIVITY_TYPE_TABLE.getName(),
+                        new String[]{
+                                AppTables.TABLE_ID_COL.getName(),
+                                AppTables.ACTIVITY_TYPE_TABLE_COL_0.getName(),
+                                AppTables.ACTIVITY_TYPE_TABLE_COL_1.getName()},
+                        utils.concatString(" ",
+                                AppTables.ACTIVITY_TYPE_TABLE_COL_1.getName(),
+                                "=",
+                                activity.id.toString()),
+                        null,
+                        null,
+                        null,
+                        null);
+                return queryCursor;
+            },
+            (cursor)->{ result.OnResult(cursor);}
+        );
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     public void getActivities(DatabaseResult result){
-        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
-            @Override
-            protected Cursor doInBackground(Void... voids) {
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... voids)-> {
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                 Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
                         new String[]{
@@ -72,35 +99,33 @@ public class Database {
                         null,
                         null);
                 return queryCursor;
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) { result.OnResult(cursor); }
-        };
-        task.execute();
+            },
+            (Cursor cursor) -> { result.OnResult(cursor); }
+        );
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void getActivityNames(DatabaseResult result){
-        //Usiamo la classe helper(wrapper) AsyncTask per eseguire la query del database su un trhead separato ma
+        //Usiamo la classe helper(wrapper) NoLeakAsyncTask che estende la classe AsyncTask per eseguire la query del database su un trhead separato ma
         //aggiorniamo la UI nel thread corretto quindi il metodo OnResult della classe DatabaseResult e' eseguito nell' UI thread
-        AsyncTask<Void,Void,Cursor> task = new AsyncTask<Void, Void, Cursor>() {
-            @Override
-            protected Cursor doInBackground(Void... voids) {
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
-                        new String[]{AppTables.ACTIVITY_TABLE_COL_0.getName()},
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-                return queryCursor;
-            }
-
-            @Override
-            protected void onPostExecute(Cursor cursor) { result.OnResult(cursor); }
-        };
-        task.execute();
+        //La Classe NoLeakAsyncTask assicura anche che non ci siano memory leak nel caso la AsyncTask viva piu della activity che
+        //l'ha iniziata utilizzando un WeakReference all'activity.
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+                mContext,
+                (Void... in) ->{
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
+                            new String[]{AppTables.ACTIVITY_TABLE_COL_0.getName()},
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+                    return queryCursor;
+                },
+                (cursor) -> { result.OnResult(cursor); }
+                );
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void getActivityIdFromName(String name, DatabaseResult result){
@@ -124,7 +149,7 @@ public class Database {
             },
             (cursor) -> { result.OnResult(cursor); }
         );
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void addAthlete(Athlete athlete, DatabaseInsert result){
@@ -201,6 +226,6 @@ public class Database {
                 return queryCursor;
             },
             (cursor) -> {result.OnResult(cursor);});
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 }
