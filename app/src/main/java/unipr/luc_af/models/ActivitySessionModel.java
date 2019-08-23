@@ -12,7 +12,7 @@ public class ActivitySessionModel extends ViewModel {
     private final MutableLiveData<ActivitySportSpecialization> dialogSelectedActivityType = new MutableLiveData<>();
     private final MutableLiveData<StartSessionData> sessionStartData = new MutableLiveData<>();
 
-    ActivitySessionModel(){}
+    public ActivitySessionModel(){}
 
     public LiveData<StartSessionData> getSessionStartData() {
         return sessionStartData;

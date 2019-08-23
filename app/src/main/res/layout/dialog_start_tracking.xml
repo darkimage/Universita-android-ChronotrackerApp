@@ -19,11 +19,19 @@
         android:textColor="@color/dialogHeaderColor"
         android:textSize="18sp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dialog_activity_list"
-        android:layout_width="match_parent"
+    <RadioGroup
         android:layout_marginTop="10dp"
-        android:layout_height="wrap_content"/>
+        android:id="@+id/dialog_radio_group_activities"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:orientation="vertical"/>
+
+    <!--<androidx.recyclerview.widget.RecyclerView-->
+        <!--android:id="@+id/dialog_activity_list"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_height="wrap_content"/>-->
 
     <TextView
         android:layout_width="match_parent"
@@ -36,12 +44,12 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/dialog_activity_no_type_message"
             android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
@@ -50,11 +58,17 @@
             android:textStyle="bold"
             />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dialog_activity_type_list"
+        <RadioGroup
+            android:id="@+id/dialog_radio_group_activities_type"
             android:layout_width="match_parent"
-            android:visibility="gone"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:orientation="vertical"/>
+        <!--<androidx.recyclerview.widget.RecyclerView-->
+            <!--android:id="@+id/dialog_activity_type_list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:visibility="gone"-->
+            <!--android:layout_height="wrap_content"/>-->
 
     </RelativeLayout>
 
@@ -62,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="right"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="5dp">
 
          <com.google.android.material.button.MaterialButton
             android:id="@+id/cancel_action"

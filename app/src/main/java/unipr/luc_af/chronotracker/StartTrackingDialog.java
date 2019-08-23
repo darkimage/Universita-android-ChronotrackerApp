@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Display;
@@ -22,10 +21,11 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import unipr.luc_af.adapters.DialogActivitySportAdapter;
-import unipr.luc_af.adapters.DialogActivityTypesAdapter;
+import unipr.luc_af.classes.ActivityGeneral;
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.ActivitySportSpecialization;
 import unipr.luc_af.classes.Athlete;
@@ -37,8 +37,6 @@ import unipr.luc_af.services.Database;
 import unipr.luc_af.services.Utils;
 
 public class StartTrackingDialog extends DialogFragment {
-    private RecyclerView mActivityList;
-    private RecyclerView mActivityTypesList;
     private ActivitySessionModel mActivitySessionModel;
     private AthleteModel mAthleteModel;
     private Athlete mCurrentAthlete;
@@ -49,6 +47,8 @@ public class StartTrackingDialog extends DialogFragment {
     private ActivitySport mSelectedActivity;
     private ActivitySportSpecialization mSelectedActivityType;
     private boolean mSelectedActivityHasTypes = false;
+    private RadioGroup mActivityGroup;
+    private RadioGroup mActivityTypeGroup;
 
     public StartTrackingDialog() {
         // Required empty public constructor
@@ -60,6 +60,21 @@ public class StartTrackingDialog extends DialogFragment {
         // Inflate the layout for this fragment
         Utils.getInstance().setToolBarNavigation((AppCompatActivity) getActivity());
         View view = inflater.inflate(R.layout.dialog_start_tracking, container, false);
+
+        mActivityGroup = view.findViewById(R.id.dialog_radio_group_activities);
+        mActivityGroup.setOnCheckedChangeListener((group, id) ->{
+            int checkedRadioButtonId = group.getCheckedRadioButtonId();
+            RadioButton currentRadio = group.findViewById(checkedRadioButtonId);
+            ActivitySport currentActivity = (ActivitySport)currentRadio.getTag();
+            mActivitySessionModel.setDialogSelectedActivity(currentActivity);
+        });
+        mActivityTypeGroup = view.findViewById(R.id.dialog_radio_group_activities_type);
+        mActivityTypeGroup.setOnCheckedChangeListener((group, id) ->{
+            int checkedRadioButtonId = group.getCheckedRadioButtonId();
+            RadioButton currentRadio = group.findViewById(checkedRadioButtonId);
+            ActivitySportSpecialization currentActivityType = (ActivitySportSpecialization)currentRadio.getTag();
+            mActivitySessionModel.setDialogSelectedActivityType(currentActivityType);
+        });
 
         mCancelButton = view.findViewById(R.id.cancel_action);
         mCancelButton.setOnClickListener((v) ->{
@@ -76,21 +91,13 @@ public class StartTrackingDialog extends DialogFragment {
 
         mExpandFromTopAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_from_top);
 
-        mActivityList = view.findViewById(R.id.dialog_activity_list);
-        mActivityList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mActivityList.setAdapter(new DialogActivitySportAdapter(getActivity()));
-
         DatabaseResult activityArray = (cursor) -> {
             ActivitySport[] activities = getActivities(cursor);
-            mActivityList.setAdapter(new DialogActivitySportAdapter(getActivity(),activities));
-            mActivityList.invalidate();
+            populateRadioGroup(mActivityGroup,activities);
         };
         Database.getInstance().getActivities(activityArray);
 
         mNoActivityTypes = view.findViewById(R.id.dialog_activity_no_type_message);
-        mActivityTypesList = view.findViewById(R.id.dialog_activity_type_list);
-        mActivityTypesList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mActivityTypesList.setAdapter(new DialogActivityTypesAdapter(getActivity()));
 
         mActivitySessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
         final Observer<ActivitySport> selectedActivity = (activitySport) -> setActivityTypes(activitySport);
@@ -102,6 +109,24 @@ public class StartTrackingDialog extends DialogFragment {
         final Observer<Athlete> athleteObserver = (athlete) -> mCurrentAthlete = athlete;
         mAthleteModel.getSelectedAthlete().observe(getActivity(),athleteObserver);
         return view;
+    }
+
+
+    private <E extends ActivityGeneral> void populateRadioGroup(RadioGroup group, E[] data){
+        for (int i = 0; i < data.length; i++) {
+            RadioButton activityButton = new RadioButton(getActivity());
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 20, 0, 0);
+            activityButton.setLayoutParams(params);
+//            TypedValue outValue = new TypedValue();
+//            getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+//            activityButton.setBackgroundResource(outValue.resourceId);
+            activityButton.setText(data[i].getName());
+            activityButton.setId(i);
+            activityButton.setTag(data[i]);
+            group.addView(activityButton);
+        }
     }
 
     private ActivitySport[] getActivities(Cursor cursor){
@@ -122,7 +147,8 @@ public class StartTrackingDialog extends DialogFragment {
     private void setActivityTypes(ActivitySport selectedActivity){
         mSelectedActivity = selectedActivity;
         mActivitySessionModel.setDialogSelectedActivityType(null);
-        DatabaseResult activityTypes = (cursor) ->{
+        mActivityTypeGroup.removeAllViews();
+        DatabaseResult activityTypes = (cursor) -> {
             cursor.moveToNext();
             ActivitySportSpecialization[] activitySportTypes = new ActivitySportSpecialization[cursor.getCount()];
             for (int i = 0; i < cursor.getCount(); i++) {
@@ -134,14 +160,14 @@ public class StartTrackingDialog extends DialogFragment {
             }
             if(activitySportTypes.length != 0) {
                 mSelectedActivityHasTypes = true;
-                mActivityTypesList.setVisibility(View.VISIBLE);
+                mActivityTypeGroup.setVisibility(View.VISIBLE);
                 mNoActivityTypes.setVisibility(View.GONE);
-                mActivityTypesList.setAdapter(new DialogActivityTypesAdapter(getActivity(), activitySportTypes));
-                mActivityTypesList.invalidate();
-                mActivityTypesList.startAnimation(mExpandFromTopAnim);
+                mActivityTypeGroup.startAnimation(mExpandFromTopAnim);
+                populateRadioGroup(mActivityTypeGroup,activitySportTypes);
+
             }else{
                 mSelectedActivityHasTypes = false;
-                mActivityTypesList.setVisibility(View.GONE);
+                mActivityTypeGroup.setVisibility(View.GONE);
                 mNoActivityTypes.setVisibility(View.VISIBLE);
             }
             setActionButtonState();

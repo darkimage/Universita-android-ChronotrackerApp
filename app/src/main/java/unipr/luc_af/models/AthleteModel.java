@@ -12,7 +12,7 @@ public class AthleteModel extends ViewModel {
     private final MutableLiveData<Athlete> athleteSelection = new MutableLiveData<>();
     private final MutableLiveData<ActivitySession[]> athleteCurrentDayActivities = new MutableLiveData<>();
 
-    AthleteModel() {}
+    public AthleteModel() {}
     public LiveData<Athlete> getAthlete() {
         return athleteData;
     }

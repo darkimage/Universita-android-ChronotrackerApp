@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class PopupItemsModel extends ViewModel {
     private final MutableLiveData<int[]> popupItemsData = new MutableLiveData<>();
 
-    PopupItemsModel() {}
+    public PopupItemsModel() {}
     public LiveData<int[]> getActiveItems() {
         return popupItemsData;
     }

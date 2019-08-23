@@ -1,15 +1,12 @@
 package unipr.luc_af.classes;
 
-public class ActivitySport {
-    public Long id = new Long(-1);
-    public String name;
+public class ActivitySport extends ActivityGeneral {
 
     public ActivitySport(Long activitySportId, String activityName){
-        id = activitySportId;
-        name = activityName;
+        super(activitySportId,activityName);
     }
 
     public ActivitySport(String activityName){
-        name = activityName;
+        super(new Long(-1),activityName);
     }
 }
