@@ -1,5 +1,6 @@
 package unipr.luc_af.chronotracker;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Point;
@@ -49,6 +50,7 @@ public class StartTrackingDialog extends DialogFragment {
     private boolean mSelectedActivityHasTypes = false;
     private RadioGroup mActivityGroup;
     private RadioGroup mActivityTypeGroup;
+    private Context mContext;
 
     public StartTrackingDialog() {
         // Required empty public constructor
@@ -58,6 +60,7 @@ public class StartTrackingDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mContext = getContext();
         Utils.getInstance().setToolBarNavigation((AppCompatActivity) getActivity());
         View view = inflater.inflate(R.layout.dialog_start_tracking, container, false);
 
@@ -114,7 +117,7 @@ public class StartTrackingDialog extends DialogFragment {
 
     private <E extends ActivityGeneral> void populateRadioGroup(RadioGroup group, E[] data){
         for (int i = 0; i < data.length; i++) {
-            RadioButton activityButton = new RadioButton(getActivity());
+            RadioButton activityButton = new RadioButton(mContext);
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 20, 0, 0);

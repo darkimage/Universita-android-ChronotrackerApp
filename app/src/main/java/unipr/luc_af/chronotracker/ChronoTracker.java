@@ -18,6 +18,8 @@ import java.util.TimerTask;
 import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.components.ChronoView;
 import unipr.luc_af.models.ActivitySessionModel;
+import unipr.luc_af.models.PopupItemsModel;
+import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Utils;
 
 
@@ -25,6 +27,7 @@ import unipr.luc_af.services.Utils;
  * A simple {@link Fragment} subclass.
  */
 public class ChronoTracker extends Fragment {
+    private TitleBarModel mTitleBarModel;
     private ChronoView mChronometer;
     private ActivitySessionModel mActivitiSessionModel;
 
@@ -41,8 +44,9 @@ public class ChronoTracker extends Fragment {
         mChronometer = view.findViewById(R.id.tracker_chronometer);
         mChronometer.Start();
 
+        mTitleBarModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
+        mTitleBarModel.setTitle(getActivity().getString(R.string.chrono_tracker_title));
         mActivitiSessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
-
         return view;
     }
 
