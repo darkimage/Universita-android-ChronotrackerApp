@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `tracked_session` (
    `speed` INTEGER NOT NULL,
    FOREIGN KEY (`athlete`) REFERENCES `athlete`(`id`),
    FOREIGN KEY (`activity`) REFERENCES `activity`(`id`),
-   FOREIGN KEY (`activity_type`) REFERENCES `activity_type`(`id`),
+   FOREIGN KEY (`activity_type`) REFERENCES `activity_type`(`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `laps` (

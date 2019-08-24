@@ -7,20 +7,19 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="20dp"
     android:paddingBottom="20dp"
     android:paddingEnd="20dp"
     android:paddingStart="20dp"
     android:orientation="vertical"
     tools:context=".StartTrackingDialog">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/start_tracking_header"
-        android:textStyle="bold"
-        android:textColor="@color/dialogHeaderColor"
-        android:textSize="18sp"/>
+<!--    android:paddingTop="20dp"-->
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/start_tracking_header"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textColor="@color/dialogHeaderColor"-->
+<!--        android:textSize="18sp"/>-->
 
     <RadioGroup
         android:layout_marginTop="10dp"
@@ -46,10 +45,10 @@
         <TextView
             android:id="@+id/dialog_activity_no_type_message"
             android:layout_width="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:paddingTop="20dp"
             android:textColor="@color/primaryDisabledColor"
             android:text="@string/start_tracking_no_specialities"
             android:textStyle="bold"
@@ -64,29 +63,29 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:layout_marginTop="5dp">
+<!--    <RelativeLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="right"-->
+<!--        android:layout_marginTop="5dp">-->
 
-         <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel_action"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/primaryDisabledColor"
-            android:text="@string/cancel"/>
+<!--         <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/cancel_action"-->
+<!--            style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textColor="@color/primaryDisabledColor"-->
+<!--            android:text="@string/cancel"/>-->
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/start_action"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/cancel_action"
-            android:textColor="@drawable/material_button_text_accent"
-            android:text="@string/start"/>
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/start_action"-->
+<!--            style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_toEndOf="@id/cancel_action"-->
+<!--            android:textColor="@drawable/material_button_text_accent"-->
+<!--            android:text="@string/start"/>-->
 
-    </RelativeLayout>
+<!--    </RelativeLayout>-->
 </LinearLayout>
 </ScrollView>

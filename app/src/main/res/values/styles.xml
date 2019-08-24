@@ -11,6 +11,7 @@
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
         <item name="colorOnPrimary">@color/primaryTextColor</item>
         <item name="colorControlHighlight">@color/highlightColor</item>
+        <item name="android:alertDialogTheme">@style/Theme.MaterialComponents.Dialog.Custom</item>
 
     </style>
 
@@ -24,5 +25,18 @@
         <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="colorControlNormal">@color/primaryTextColor</item>
         <item name="colorControlHighlight">@color/highlightColor</item>
+    </style>
+
+    <style name="Theme.MaterialComponents.Dialog.Custom" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/primaryDisabledColor</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@drawable/material_button_text_accent</item>
     </style>
 </resources>
