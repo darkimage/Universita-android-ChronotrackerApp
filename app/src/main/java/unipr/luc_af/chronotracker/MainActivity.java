@@ -5,19 +5,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
-import androidx.fragment.app.Fragment;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.google.android.material.snackbar.Snackbar;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
-
-import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.models.ActivitySessionModel;

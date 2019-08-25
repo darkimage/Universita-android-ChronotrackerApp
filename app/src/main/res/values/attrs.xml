@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ChronoView">
+        <attr name="milliseconds_color" format="color"/>
+        <attr name="spinner_background" format="color"/>
+        <attr name="spinner_shadow" format="color"/>
+        <attr name="spinner_width" format="dimension"/>
+        <attr name="spinner_color" format="color"/>
+    </declare-styleable>
+</resources>

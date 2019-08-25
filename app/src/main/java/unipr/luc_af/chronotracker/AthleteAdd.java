@@ -2,12 +2,10 @@ package unipr.luc_af.chronotracker;
 
 import android.database.Cursor;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +13,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Database;
 import unipr.luc_af.services.Utils;
-
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
 

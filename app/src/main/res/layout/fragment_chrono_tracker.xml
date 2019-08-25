@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ChronoTracker">
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35" />
 
     <unipr.luc_af.components.ChronoView
         android:id="@+id/tracker_chronometer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/guideline"
+        app:layout_constraintTop_toTopOf="@id/layout"
+        app:spinner_width="30dp"
+        app:spinner_shadow="@color/primaryDisabledColor"
+        app:spinner_color="@color/primaryLightColor"
+        app:spinner_background="@color/primaryDisabledColorLight"
+        app:milliseconds_color="@color/primaryDisabledColor"/>
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

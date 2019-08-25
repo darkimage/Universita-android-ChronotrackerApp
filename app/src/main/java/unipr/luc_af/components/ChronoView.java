@@ -1,6 +1,18 @@
 package unipr.luc_af.components;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
+import android.graphics.SweepGradient;
+import android.graphics.Xfermode;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
@@ -8,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -16,26 +27,134 @@ import java.util.concurrent.TimeUnit;
 import unipr.luc_af.chronotracker.R;
 
 public class ChronoView extends LinearLayout {
+    //LOGIC
     private Timer mChronometer;
     private TimerTask mChronoTask;
-    private TextView mChronoText;
     private Long mStartTime;
     private Long mLastLap;
 
+    //UI
+    private TextView mChronoText;
+    private TextView mChronoMillText;
+    private RectF mArcViewSize;
+    private RectF mViewSize;
+    private Paint mSpinnerPaint;
+    private Paint mSpinnerTimePaint;
+    private Paint mSpinnerShadowPaint;
+    private SweepGradient mSpinnerGradient;
+    private int mSpinnerColor;
+    private double mTheta = 0f;
+    private float mSpinnerWidth;
+    private float mOffset;
+    private Matrix mGradientMatrix;
+    private Bitmap mSpinnerHeaderBitmap;
+    private Canvas mSpinnerHeaderCanvas;
+    private RectF mClipRect;
+    private float mRadius;
+    private PorterDuffXfermode mClearPorter;
+
+
     public ChronoView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context,attrs,0);
+    }
+
+    public ChronoView(Context context, AttributeSet attrs, int defStyleAttrs) {
+        super(context, attrs, defStyleAttrs);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ChronoView, defStyleAttrs, 0);
         View view = inflate(context, R.layout.component_chrono_view, this);
+
         final Handler handler = new Handler();
         mChronometer = new Timer();
-        mChronoText = view.findViewById(R.id.chronoview_main_text);
         mChronoTask = new TimerTask() {
             @Override
             public void run() {
                 handler.post(() -> updateView());
             }
         };
+        setUpUI(typedArray,view);
+        typedArray.recycle();
+        setWillNotDraw(false);
+        mClearPorter = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        int min = Math.min(w,h);
+        float offsetLeft = (w - min)/2.0f;
+        float offsetTop = (h - min)/2.0f;
+
+        mArcViewSize = new RectF(
+                offsetLeft + mOffset +  mSpinnerWidth/2.0f, // left
+                offsetTop + mOffset +  mSpinnerWidth/2.0f, // top
+                min + offsetLeft - mOffset -  mSpinnerWidth/2.0f, // right
+                min + offsetTop - mOffset -  mSpinnerWidth/2.0f // bottom
+        );
+
+        mViewSize = new RectF(0 + mOffset,0 + mOffset, w - mOffset,h - mOffset);
+
+        mSpinnerGradient = new SweepGradient(mViewSize.centerX(), mViewSize.centerY(),
+                new int[]{Color.TRANSPARENT, mSpinnerColor},
+                new float[]{0.75f, 1.0f});
+
+        mSpinnerHeaderBitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        mSpinnerHeaderCanvas = new Canvas(mSpinnerHeaderBitmap);
+        mRadius = Math.min(mViewSize.width(),mViewSize.height())/2.0f - mSpinnerWidth/2.0f;
+        mClipRect = new RectF(
+                mViewSize.centerX() - mRadius - mSpinnerWidth,
+                mViewSize.centerY() - mRadius - mSpinnerWidth,
+                mViewSize.centerX() - 5,
+                mViewSize.centerY() - 5);
+
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawCircle( mViewSize.centerX(),mViewSize.centerY(),mRadius, mSpinnerPaint);
+        canvas.drawCircle( mViewSize.centerX(),mViewSize.centerY(),mRadius - mSpinnerWidth/2.0f, mSpinnerShadowPaint);
+
+        mSpinnerHeaderCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        float startGradient;
+        float endGradient;
+        SweepGradient gradient;
+        mGradientMatrix.reset();
+        if(mTheta < Math.toRadians(90)) {
+            startGradient = 0.0f;
+            endGradient = (float) (mTheta / Math.toRadians(360)) % 1.0f;
+            gradient = new SweepGradient(mViewSize.centerX(), mViewSize.centerY(),
+                    new int[]{Color.TRANSPARENT, mSpinnerColor},
+                    new float[]{startGradient, endGradient});
+            float rotate = -90;
+            mGradientMatrix.preRotate(rotate, mViewSize.centerX(), mViewSize.centerY());
+            gradient.setLocalMatrix(mGradientMatrix);
+        }else{
+            gradient = mSpinnerGradient;
+            float rotate = -90 + (float)Math.toDegrees(mTheta);
+            mGradientMatrix.preRotate(rotate, mViewSize.centerX(), mViewSize.centerY());
+            gradient.setLocalMatrix(mGradientMatrix);
+        }
+
+        mSpinnerTimePaint.setShader(gradient);
+        mSpinnerTimePaint.setXfermode(null);
+        mSpinnerTimePaint.setStyle(Paint.Style.STROKE);
+        canvas.drawArc(mArcViewSize, -90, (float)Math.toDegrees(mTheta), false, mSpinnerTimePaint);
+        float circleX = (float)(mRadius*Math.cos(mTheta-Math.toRadians(90f))) + mViewSize.centerX();
+        float circleY = (float)(mRadius*Math.sin(mTheta-Math.toRadians(90f))) + mViewSize.centerY();
+
+        mSpinnerTimePaint.setStyle(Paint.Style.FILL);
+        mSpinnerTimePaint.setShader(null);
+        mSpinnerHeaderCanvas.drawCircle(circleX, circleY,mSpinnerWidth/2.0f, mSpinnerTimePaint);
+
+        mSpinnerHeaderCanvas.save();
+        mSpinnerHeaderCanvas.rotate((float)Math.toDegrees(mTheta), mViewSize.centerX(), mViewSize.centerY());
+        mSpinnerTimePaint.setShader(null);
+//        canvas.drawCircle(circleX, circleY,mSpinnerWidth/mRadius, mSpinnerTimePaint);
+        mSpinnerTimePaint.setXfermode(mClearPorter);
+        mSpinnerHeaderCanvas.drawRect(mClipRect,mSpinnerTimePaint);
+        mSpinnerHeaderCanvas.restore();
+        canvas.drawBitmap(mSpinnerHeaderBitmap,0,0,null);
+    }
 
     public long Start(){
         mChronometer.scheduleAtFixedRate(mChronoTask,0,10);
@@ -63,12 +182,15 @@ public class ChronoView extends LinearLayout {
 
     private void updateView(){
         long current = getCurrentTime() - mStartTime;
-        String text = String.format("%02d:%02d:%02d:%03d",
+        String timeText = String.format("%02d:%02d:%02d",
             TimeUnit.MILLISECONDS.toHours(current),
             TimeUnit.MILLISECONDS.toMinutes(current) % 60,
-            TimeUnit.MILLISECONDS.toSeconds(current) % 60,
-            current % 1000);
-        mChronoText.setText(text);
+            TimeUnit.MILLISECONDS.toSeconds(current) % 60);
+        mChronoText.setText(timeText);
+
+        String millText = String.format(":%03d",current % 1000);
+        mChronoMillText.setText(millText);
+        mTheta += Math.toRadians(360)/6000f;
     }
 
     private long getCurrentTime(){
@@ -77,5 +199,53 @@ public class ChronoView extends LinearLayout {
 
     private Calendar getCurrentCalendar(){
         return Calendar.getInstance();
+    }
+
+    private void setUpUI(TypedArray typedArray, View view){
+        int text_color = typedArray.getColor(
+                R.styleable.ChronoView_milliseconds_color,
+                getResources().getColor(R.color.primaryDisabledColor));
+
+        int backgroundColor = typedArray.getColor(
+                R.styleable.ChronoView_spinner_background,
+                getResources().getColor(R.color.primaryLightColor));
+
+        int shadowColor = typedArray.getColor(
+                R.styleable.ChronoView_spinner_shadow,
+                Color.BLACK);
+
+        mGradientMatrix = new Matrix();
+
+        mSpinnerColor = typedArray.getColor(
+                R.styleable.ChronoView_spinner_color,
+                getResources().getColor(R.color.primaryColor));
+
+        mSpinnerWidth = typedArray.getDimension(
+                R.styleable.ChronoView_spinner_width,
+                50.0f);
+
+        mChronoText = view.findViewById(R.id.chronoview_main_text);
+        mChronoMillText = view.findViewById(R.id.chronoview_milliseconds_text);
+
+
+        mSpinnerPaint = new Paint();
+        mSpinnerPaint.setAntiAlias(true);
+        mSpinnerPaint.setStyle(Paint.Style.STROKE);
+        mSpinnerPaint.setStrokeWidth(mSpinnerWidth);
+        mSpinnerPaint.setColor(backgroundColor);
+
+        mSpinnerShadowPaint = new Paint();
+        mSpinnerShadowPaint.setAntiAlias(true);
+        mSpinnerShadowPaint.setColor(Color.WHITE);
+        mSpinnerShadowPaint.setShadowLayer(mSpinnerWidth/2.0f,0,mSpinnerWidth/4.0f, shadowColor);
+
+        mSpinnerTimePaint = new Paint();
+        mSpinnerTimePaint.setAntiAlias(true);
+        mSpinnerTimePaint.setStyle(Paint.Style.STROKE);
+        mSpinnerTimePaint.setStrokeWidth(mSpinnerWidth);
+        mSpinnerTimePaint.setColor(mSpinnerColor);
+
+        mChronoMillText.setTextColor(text_color);
+        mOffset = mSpinnerWidth / 2.0f;
     }
 }

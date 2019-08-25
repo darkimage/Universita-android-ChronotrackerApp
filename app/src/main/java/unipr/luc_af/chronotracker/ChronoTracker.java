@@ -2,23 +2,14 @@ package unipr.luc_af.chronotracker;
 
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Handler;
-import android.widget.TextView;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.components.ChronoView;
 import unipr.luc_af.models.ActivitySessionModel;
-import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.services.Utils;
 

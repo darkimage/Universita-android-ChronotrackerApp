@@ -2,15 +2,12 @@ package unipr.luc_af.chronotracker;
 
 
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +15,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CalendarView;
 import android.widget.TextView;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
 import unipr.luc_af.adapters.ActivitySessionAdapter;
 import unipr.luc_af.classes.Athlete;
-import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.database.interfaces.DatabaseResult;
-import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;

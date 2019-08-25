@@ -9,6 +9,7 @@
     <color name="secondaryDarkColor">#c60055</color>
     <color name="primaryTextColor">#fafafa</color>
     <color name="primaryDisabledColor">#8F838383</color>
+    <color name="primaryDisabledColorLight">#8FE0E0E0</color>
     <color name="secondaryTextColor">#F3FFFFFF</color>
     <color name="backgroundColor">#ffffff</color>
     <color name="highlightColor">#C0D7F0</color>

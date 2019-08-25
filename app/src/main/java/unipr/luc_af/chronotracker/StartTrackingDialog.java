@@ -7,17 +7,13 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +27,6 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
 import unipr.luc_af.classes.ActivityGeneral;
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.ActivitySportSpecialization;
@@ -59,7 +54,7 @@ public class StartTrackingDialog extends DialogFragment {
     private RadioGroup mActivityGroup;
     private RadioGroup mActivityTypeGroup;
     private Context mContext;
-    private boolean previusHasEntries = false;
+    private boolean previousHasEntries = false;
     private int mActivitySelectedId = -1;
     private int mActivityTypeSelectedId = -1;
 
@@ -113,8 +108,7 @@ public class StartTrackingDialog extends DialogFragment {
             ActivitySport[] activities = getActivities(cursor);
             populateRadioGroup(mActivityGroup, activities);
             if (savedInstanceState != null) {
-                int activitySelectedId = savedInstanceState.getInt(SAVED_ACTIVITY_ID);
-                RadioButton activityRadio = mActivityGroup.findViewById(activitySelectedId);
+                RadioButton activityRadio = mActivityGroup.findViewById(mActivitySelectedId);
                 activityRadio.toggle();
             }
         };
@@ -156,9 +150,6 @@ public class StartTrackingDialog extends DialogFragment {
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0, 20, 0, 0);
             activityButton.setLayoutParams(params);
-//            TypedValue outValue = new TypedValue();
-//            getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-//            activityButton.setBackgroundResource(outValue.resourceId);
             activityButton.setText(data[i].getName());
             activityButton.setId(i);
             activityButton.setTag(data[i]);
@@ -197,16 +188,16 @@ public class StartTrackingDialog extends DialogFragment {
                 cursor.moveToNext();
             }
             if(activitySportTypes.length != 0) {
-                if (!previusHasEntries) {
+                if (!previousHasEntries) {
                     showActivityTypesRadioButtons(activitySportTypes);
                 }else{
                     mActivityTypeGroup.postDelayed(() ->{
                         showActivityTypesRadioButtons(activitySportTypes);
                     }, mCollapseFromTopAnim.getDuration());
                 }
-                previusHasEntries = true;
+                previousHasEntries = true;
             }else{
-                previusHasEntries = false;
+                previousHasEntries = false;
                 mSelectedActivityHasTypes = false;
                 mActivityTypeSelectedId = -1;
                 mActivityTypeGroup.postDelayed(() -> {

@@ -2,12 +2,8 @@ package unipr.luc_af.chronotracker;
 
 
 import android.graphics.drawable.AnimatedVectorDrawable;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

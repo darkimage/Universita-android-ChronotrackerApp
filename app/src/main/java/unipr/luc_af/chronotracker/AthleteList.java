@@ -2,7 +2,6 @@ package unipr.luc_af.chronotracker;
 
 import android.database.Cursor;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -10,14 +9,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import unipr.luc_af.adapters.AthleteAdapter;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.database.interfaces.DatabaseResult;
