@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/guideline_chronoview_percent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -17,12 +17,41 @@
         android:id="@+id/tracker_chronometer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/guideline"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_chronoview_percent"
         app:layout_constraintTop_toTopOf="@id/layout"
         app:spinner_width="30dp"
+        app:time_size="6sp"
         app:spinner_shadow="@color/primaryDisabledColor"
         app:spinner_color="@color/primaryLightColor"
         app:spinner_background="@color/primaryDisabledColorLight"
         app:milliseconds_color="@color/primaryDisabledColor"/>
+
+    <Button
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chronoview_start_stop_fab"
+        app:layout_constraintStart_toStartOf="@id/layout"
+        android:text="@string/lap"/>
+
+<!--    <androidx.coordinatorlayout.widget.CoordinatorLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        app:layout_constraintStart_toEndOf="@id/layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/chronoview_start_stop_fab"
+        style="@style/Theme.MaterialComponents.ChronoFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="16dp"
+        app:srcCompat="@drawable/start_to_pause_anim"/>
+
+<!--        </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,4 +39,11 @@
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@drawable/material_button_text_accent</item>
     </style>
+
+     <style name="Theme.MaterialComponents.ChronoFab" parent="Widget.MaterialComponents.FloatingActionButton">
+         <item name="backgroundTint">@android:color/white</item>
+         <item name="tint">@android:color/black</item>
+    </style>
+
+
 </resources>

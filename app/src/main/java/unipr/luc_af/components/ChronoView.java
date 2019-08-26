@@ -11,15 +11,13 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.SweepGradient;
-import android.graphics.Xfermode;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +29,21 @@ public class ChronoView extends LinearLayout {
     private Timer mChronometer;
     private TimerTask mChronoTask;
     private Long mStartTime;
-    private Long mLastLap;
+    private Long mLastLapTime;
+    private Long mLastLapDuration = new Long(0);
+    private Long mLastPauseTime;
+    private Long mTotalElapsed = new Long(0);
+    private final Handler mHandler = new Handler();
+    private ChronoView.State mCurrentState;
+    private StateChangeListener mStateChangeListener = (state, view) -> {};
+    private OnTickListener mOnTickListener = (time) -> {};
+    private OnLapListener mOnLapListener = (duration) -> {};
 
     //UI
     private TextView mChronoText;
     private TextView mChronoMillText;
+    private TextView mChronoLapText;
+    private TextView mChronoLapMillText;
     private RectF mArcViewSize;
     private RectF mViewSize;
     private Paint mSpinnerPaint;
@@ -53,6 +61,11 @@ public class ChronoView extends LinearLayout {
     private float mRadius;
     private PorterDuffXfermode mClearPorter;
 
+    enum State {
+        TRACKING,
+        PAUSED,
+        RESETTED
+    }
 
     public ChronoView(Context context, AttributeSet attrs) {
         this(context,attrs,0);
@@ -62,19 +75,12 @@ public class ChronoView extends LinearLayout {
         super(context, attrs, defStyleAttrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ChronoView, defStyleAttrs, 0);
         View view = inflate(context, R.layout.component_chrono_view, this);
-
-        final Handler handler = new Handler();
         mChronometer = new Timer();
-        mChronoTask = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(() -> updateView());
-            }
-        };
+        mChronoTask = createTimerTask();
         setUpUI(typedArray,view);
         typedArray.recycle();
         setWillNotDraw(false);
-        mClearPorter = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+        updateView(0);
     }
 
     @Override
@@ -149,7 +155,6 @@ public class ChronoView extends LinearLayout {
         mSpinnerHeaderCanvas.save();
         mSpinnerHeaderCanvas.rotate((float)Math.toDegrees(mTheta), mViewSize.centerX(), mViewSize.centerY());
         mSpinnerTimePaint.setShader(null);
-//        canvas.drawCircle(circleX, circleY,mSpinnerWidth/mRadius, mSpinnerTimePaint);
         mSpinnerTimePaint.setXfermode(mClearPorter);
         mSpinnerHeaderCanvas.drawRect(mClipRect,mSpinnerTimePaint);
         mSpinnerHeaderCanvas.restore();
@@ -157,31 +162,72 @@ public class ChronoView extends LinearLayout {
     }
 
     public long Start(){
+        mCurrentState = State.TRACKING;
         mChronometer.scheduleAtFixedRate(mChronoTask,0,10);
-        mStartTime = getCurrentTime();
-        mLastLap = mStartTime;
-        return 0;
+        if(mStartTime == null) {
+            mStartTime = getCurrentTime();
+            mLastLapTime = mStartTime;
+        }else{
+            long oldStart = mStartTime;
+            mStartTime = getCurrentTime();
+            return oldStart;
+        }
+        return mStartTime;
     }
 
     public long Pause(){
+        mCurrentState = State.PAUSED;
         mChronometer.cancel();
-        return 0;
+        mChronometer = new Timer();
+        mChronoTask = createTimerTask();
+        mLastPauseTime = getCurrentTime();
+        mTotalElapsed += mLastPauseTime - mStartTime;
+        return mLastPauseTime;
     }
 
     public long Lap(){
-        return 0;
+        if(mCurrentState != State.PAUSED) {
+            long current = getCurrentTime();
+            long lapTime = current - mLastLapTime;
+            mLastLapDuration = lapTime;
+            mLastLapTime = current;
+            mOnLapListener.onLap(lapTime);
+            return current;
+        }
+        return -1;
     }
 
-    public long ElapseFromLastLap(){
+    public long ElapsedFromLastLap(){
         return 0;
     }
 
     public void Reset(){
-
+        mCurrentState = State.RESETTED;
+        Pause();
+        mStartTime = null;
+        mLastPauseTime = null;
+        mTheta = 0;
+        resetView();
     }
 
-    private void updateView(){
-        long current = getCurrentTime() - mStartTime;
+    public void setOnStateChangeListener(StateChangeListener onStateChange){
+        mStateChangeListener = onStateChange;
+    }
+
+    public void setOnTickListener(OnTickListener onTickListener){
+        mOnTickListener = onTickListener;
+    }
+
+    public void setOnLapListener(OnLapListener onLapListener){
+        mOnLapListener = onLapListener;
+    }
+
+    private void resetView(){
+        invalidate();
+        updateView(0);
+    }
+
+    private void updateView(long current){
         String timeText = String.format("%02d:%02d:%02d",
             TimeUnit.MILLISECONDS.toHours(current),
             TimeUnit.MILLISECONDS.toMinutes(current) % 60,
@@ -190,7 +236,35 @@ public class ChronoView extends LinearLayout {
 
         String millText = String.format(":%03d",current % 1000);
         mChronoMillText.setText(millText);
-        mTheta += Math.toRadians(360)/6000f;
+
+        String lapText = String.format("%02d:%02d:%02d",
+            TimeUnit.MILLISECONDS.toHours(mLastLapDuration),
+            TimeUnit.MILLISECONDS.toMinutes(mLastLapDuration) % 60,
+            TimeUnit.MILLISECONDS.toSeconds(mLastLapDuration) % 60);
+        mChronoLapText.setText(lapText);
+
+        String millLapText = String.format(":%03d",mLastLapDuration % 1000);
+        mChronoLapMillText.setText(millLapText);
+
+        mTheta = (current == 0) ? 0 : mTheta + Math.toRadians(360) / 6000f;
+    }
+
+    private TimerTask createTimerTask(){
+        return new TimerTask() {
+            @Override
+            public void run() {
+                mHandler.post(() -> {
+                    if(mCurrentState != State.PAUSED) {
+                        long current;
+                        current = getCurrentTime() - mStartTime;
+                        if (mLastPauseTime != null) {
+                            current += mTotalElapsed;
+                        }
+                        updateView(current);
+                    }
+                });
+            }
+        };
     }
 
     private long getCurrentTime(){
@@ -202,7 +276,7 @@ public class ChronoView extends LinearLayout {
     }
 
     private void setUpUI(TypedArray typedArray, View view){
-        int text_color = typedArray.getColor(
+        int millisecondsColor = typedArray.getColor(
                 R.styleable.ChronoView_milliseconds_color,
                 getResources().getColor(R.color.primaryDisabledColor));
 
@@ -214,7 +288,24 @@ public class ChronoView extends LinearLayout {
                 R.styleable.ChronoView_spinner_shadow,
                 Color.BLACK);
 
+        float textSize = typedArray.getDimension(
+                R.styleable.ChronoView_time_size,
+                18);
+
+        float textLapSize = typedArray.getDimension(
+                R.styleable.ChronoView_lap_size,
+                10);
+
+        float millisecondsSize = typedArray.getDimension(
+                R.styleable.ChronoView_milliseconds_size,
+                12);
+
+        float millisecondsLapSize = typedArray.getDimension(
+                R.styleable.ChronoView_lap_milliseconds_size,
+                6);
+
         mGradientMatrix = new Matrix();
+        mClearPorter = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
 
         mSpinnerColor = typedArray.getColor(
                 R.styleable.ChronoView_spinner_color,
@@ -225,7 +316,16 @@ public class ChronoView extends LinearLayout {
                 50.0f);
 
         mChronoText = view.findViewById(R.id.chronoview_main_text);
+        mChronoText.setTextSize(textSize);
         mChronoMillText = view.findViewById(R.id.chronoview_milliseconds_text);
+        mChronoMillText.setTextSize(millisecondsSize);
+        mChronoMillText.setTextColor(millisecondsColor);
+
+        mChronoLapText = view.findViewById(R.id.chronoview_lap_text);
+        mChronoLapText.setTextSize(textLapSize);
+        mChronoLapMillText = view.findViewById(R.id.chronoview_lap_milliseconds_text);
+        mChronoLapMillText.setTextSize(millisecondsLapSize);
+        mChronoLapMillText.setTextColor(millisecondsColor);
 
 
         mSpinnerPaint = new Paint();
@@ -245,7 +345,18 @@ public class ChronoView extends LinearLayout {
         mSpinnerTimePaint.setStrokeWidth(mSpinnerWidth);
         mSpinnerTimePaint.setColor(mSpinnerColor);
 
-        mChronoMillText.setTextColor(text_color);
         mOffset = mSpinnerWidth / 2.0f;
+    }
+
+    public interface StateChangeListener{
+        void onStateChange(State state, ChronoView view);
+    }
+
+    public interface OnTickListener {
+        void onTick(long time);
+    }
+
+    public interface OnLapListener{
+        void onLap(long duration);
     }
 }

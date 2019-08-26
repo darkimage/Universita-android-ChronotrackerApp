@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/chronoview_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -22,7 +23,30 @@
             android:id="@+id/chronoview_milliseconds_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text=":459"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="5dp"
+        android:layout_below="@+id/chronoview_main">
+
+        <TextView
+            android:id="@+id/chronoview_lap_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="01:20:55"/>
+
+        <TextView
+            android:id="@+id/chronoview_lap_milliseconds_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
             tools:text=":459"/>

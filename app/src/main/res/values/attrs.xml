@@ -6,5 +6,9 @@
         <attr name="spinner_shadow" format="color"/>
         <attr name="spinner_width" format="dimension"/>
         <attr name="spinner_color" format="color"/>
+        <attr name="time_size" format="dimension"/>
+        <attr name="lap_size" format="dimension"/>
+        <attr name="lap_milliseconds_size" format="dimension"/>
+        <attr name="milliseconds_size" format="dimension"/>
     </declare-styleable>
 </resources>
