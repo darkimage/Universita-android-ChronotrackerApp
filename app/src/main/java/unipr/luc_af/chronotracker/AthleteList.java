@@ -35,7 +35,7 @@ public class AthleteList extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.athletes_list_layout, container, false);
+        View view = inflater.inflate(R.layout.fragment_athletes_list, container, false);
         mAthleteList = view.findViewById(R.id.recycle_list);
         // Performance extra se gli oggetti non cambiano il layout della RecycleView
         mAthleteList.setHasFixedSize(true);

@@ -21,6 +21,8 @@
     <string name="export_all_activities">Export all</string>
     <string name="export_current_day_activities">Export current day</string>
     <string name="lap">Lap</string>
+    <string name="lap_placeholder">Lap %1$s</string>
+    <string name="duration_placeholder">Duration %1$s</string>
     <string name="activity_item_laps">Laps:</string>
     <string name="stop">Stop</string>
     <string name="no_athlete_records">No athletes profiles</string>
@@ -30,5 +32,6 @@
     <string name="start_tracking_speciality">Sport speciality</string>
     <string name="start_tracking_no_specialities">No specialities</string>
     <string name="select_activity">Select a sport</string>
+    <string name="reset">Reset</string>
     <string name="chrono_tracker_title">Chronometer</string>
 </resources>

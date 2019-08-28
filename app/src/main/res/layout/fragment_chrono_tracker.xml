@@ -1,17 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/tracker_lap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_stopwatch_solid"
+        android:backgroundTint="@drawable/chrono_tracker_action_state_tint"
+        android:contentDescription="@string/lap"
+        app:layout_constraintBottom_toBottomOf="@+id/chronoview_start_stop_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/chronoview_start_stop_fab"
+        app:layout_constraintTop_toTopOf="@+id/chronoview_start_stop_fab" />
+
+    <ImageButton
+        android:id="@+id/tracker_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_undo_alt_solid"
+        android:backgroundTint="@drawable/chrono_tracker_action_state_tint"
+        android:contentDescription="@string/reset"
+        app:layout_constraintBottom_toBottomOf="@+id/chronoview_start_stop_fab"
+        app:layout_constraintEnd_toStartOf="@+id/chronoview_start_stop_fab"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/chronoview_start_stop_fab" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_chronoview_percent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.35" />
+        app:layout_constraintGuide_percent="0.47" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tracker_laps"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/chronoview_start_stop_fab"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tracker_chronometer" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/chronoview_start_stop_fab"
+        style="@style/Theme.MaterialComponents.ChronoFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/start_to_pause_anim" />
 
     <unipr.luc_af.components.ChronoView
         android:id="@+id/tracker_chronometer"
@@ -19,39 +66,14 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/guideline_chronoview_percent"
         app:layout_constraintTop_toTopOf="@id/layout"
-        app:spinner_width="30dp"
-        app:time_size="6sp"
-        app:spinner_shadow="@color/primaryDisabledColor"
-        app:spinner_color="@color/primaryLightColor"
+        app:milliseconds_color="@color/primaryDisabledColor"
         app:spinner_background="@color/primaryDisabledColorLight"
-        app:milliseconds_color="@color/primaryDisabledColor"/>
-
-    <Button
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chronoview_start_stop_fab"
-        app:layout_constraintStart_toStartOf="@id/layout"
-        android:text="@string/lap"/>
-
-<!--    <androidx.coordinatorlayout.widget.CoordinatorLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        app:layout_constraintStart_toEndOf="@id/layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:id="@+id/chronoview_start_stop_fab"
-        style="@style/Theme.MaterialComponents.ChronoFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="16dp"
-        app:srcCompat="@drawable/start_to_pause_anim"/>
-
-<!--        </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+        app:spinner_color="@color/primaryLightColor"
+        app:spinner_shadow="@color/primaryDisabledColor"
+        app:spinner_width="30dp"
+        app:lap_size="8sp"
+        app:lap_milliseconds_size="5sp"
+        app:time_size="12sp"
+        app:milliseconds_size="6sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

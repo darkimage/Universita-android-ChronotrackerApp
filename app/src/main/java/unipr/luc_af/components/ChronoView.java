@@ -37,7 +37,7 @@ public class ChronoView extends LinearLayout {
     private ChronoView.State mCurrentState;
     private StateChangeListener mStateChangeListener = (state, view) -> {};
     private OnTickListener mOnTickListener = (time) -> {};
-    private OnLapListener mOnLapListener = (duration) -> {};
+    private OnLapListener mOnLapListener = (elapsed, duration) -> {};
 
     //UI
     private TextView mChronoText;
@@ -61,10 +61,10 @@ public class ChronoView extends LinearLayout {
     private float mRadius;
     private PorterDuffXfermode mClearPorter;
 
-    enum State {
-        TRACKING,
-        PAUSED,
-        RESETTED
+    public enum State {
+        TRACK,
+        PAUSE,
+        RESET
     }
 
     public ChronoView(Context context, AttributeSet attrs) {
@@ -75,12 +75,13 @@ public class ChronoView extends LinearLayout {
         super(context, attrs, defStyleAttrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ChronoView, defStyleAttrs, 0);
         View view = inflate(context, R.layout.component_chrono_view, this);
-        mChronometer = new Timer();
-        mChronoTask = createTimerTask();
+        setUpTask();
         setUpUI(typedArray,view);
         typedArray.recycle();
         setWillNotDraw(false);
-        updateView(0);
+        updateView(0,0);
+        mCurrentState = State.RESET;
+        mStateChangeListener.onStateChange(mCurrentState,this);
     }
 
     @Override
@@ -162,7 +163,8 @@ public class ChronoView extends LinearLayout {
     }
 
     public long Start(){
-        mCurrentState = State.TRACKING;
+        mCurrentState = State.TRACK;
+        mStateChangeListener.onStateChange(mCurrentState,this);
         mChronometer.scheduleAtFixedRate(mChronoTask,0,10);
         if(mStartTime == null) {
             mStartTime = getCurrentTime();
@@ -176,22 +178,25 @@ public class ChronoView extends LinearLayout {
     }
 
     public long Pause(){
-        mCurrentState = State.PAUSED;
-        mChronometer.cancel();
-        mChronometer = new Timer();
-        mChronoTask = createTimerTask();
-        mLastPauseTime = getCurrentTime();
-        mTotalElapsed += mLastPauseTime - mStartTime;
-        return mLastPauseTime;
+        if(mCurrentState != State.RESET) {
+            mCurrentState = State.PAUSE;
+            mStateChangeListener.onStateChange(mCurrentState,this);
+            mChronometer.cancel();
+            setUpTask();
+            mLastPauseTime = getCurrentTime();
+            mTotalElapsed += mLastPauseTime - mStartTime;
+            return mLastPauseTime;
+        }
+        return -1;
     }
 
     public long Lap(){
-        if(mCurrentState != State.PAUSED) {
+        if(mCurrentState != State.PAUSE) {
             long current = getCurrentTime();
             long lapTime = current - mLastLapTime;
             mLastLapDuration = lapTime;
             mLastLapTime = current;
-            mOnLapListener.onLap(lapTime);
+            mOnLapListener.onLap(lapTime, getCurrentDuration());
             return current;
         }
         return -1;
@@ -202,10 +207,12 @@ public class ChronoView extends LinearLayout {
     }
 
     public void Reset(){
-        mCurrentState = State.RESETTED;
         Pause();
+        mCurrentState = State.RESET;
+        mStateChangeListener.onStateChange(mCurrentState,this);
         mStartTime = null;
         mLastPauseTime = null;
+        mLastLapDuration = new Long(0);
         mTheta = 0;
         resetView();
     }
@@ -224,29 +231,34 @@ public class ChronoView extends LinearLayout {
 
     private void resetView(){
         invalidate();
-        updateView(0);
+        updateView(0,0);
     }
 
-    private void updateView(long current){
+    private void updateView(long current, long lap){
         String timeText = String.format("%02d:%02d:%02d",
             TimeUnit.MILLISECONDS.toHours(current),
             TimeUnit.MILLISECONDS.toMinutes(current) % 60,
             TimeUnit.MILLISECONDS.toSeconds(current) % 60);
         mChronoText.setText(timeText);
 
-        String millText = String.format(":%03d",current % 1000);
+        String millText = String.format(".%03d",current % 1000);
         mChronoMillText.setText(millText);
 
         String lapText = String.format("%02d:%02d:%02d",
-            TimeUnit.MILLISECONDS.toHours(mLastLapDuration),
-            TimeUnit.MILLISECONDS.toMinutes(mLastLapDuration) % 60,
-            TimeUnit.MILLISECONDS.toSeconds(mLastLapDuration) % 60);
+            TimeUnit.MILLISECONDS.toHours(lap),
+            TimeUnit.MILLISECONDS.toMinutes(lap) % 60,
+            TimeUnit.MILLISECONDS.toSeconds(lap) % 60);
         mChronoLapText.setText(lapText);
 
-        String millLapText = String.format(":%03d",mLastLapDuration % 1000);
+        String millLapText = String.format(".%03d",lap % 1000);
         mChronoLapMillText.setText(millLapText);
 
         mTheta = (current == 0) ? 0 : mTheta + Math.toRadians(360) / 6000f;
+    }
+
+    private void setUpTask(){
+        mChronometer = new Timer();
+        mChronoTask = createTimerTask();
     }
 
     private TimerTask createTimerTask(){
@@ -254,17 +266,22 @@ public class ChronoView extends LinearLayout {
             @Override
             public void run() {
                 mHandler.post(() -> {
-                    if(mCurrentState != State.PAUSED) {
-                        long current;
-                        current = getCurrentTime() - mStartTime;
-                        if (mLastPauseTime != null) {
-                            current += mTotalElapsed;
-                        }
-                        updateView(current);
+                    if(mCurrentState != State.PAUSE &&
+                        mCurrentState != State.RESET) {
+                        getCurrentDuration();
+                        updateView(getCurrentDuration(), mLastLapDuration);
                     }
                 });
             }
         };
+    }
+
+    private long getCurrentDuration(){
+        long current = getCurrentTime() - mStartTime;
+        if (mLastPauseTime != null) {
+            current += mTotalElapsed;
+        }
+        return current;
     }
 
     private long getCurrentTime(){
@@ -357,6 +374,6 @@ public class ChronoView extends LinearLayout {
     }
 
     public interface OnLapListener{
-        void onLap(long duration);
+        void onLap(long duration, long currentDuration);
     }
 }
