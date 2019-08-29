@@ -9,10 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-
-/**
- * A simple {@link Fragment} subclass.
- */
 public class SessionTracker extends Fragment {
     AnimatedVectorDrawable mStartToStopAnim;
     AnimatedVectorDrawable mStopToStartAnim;

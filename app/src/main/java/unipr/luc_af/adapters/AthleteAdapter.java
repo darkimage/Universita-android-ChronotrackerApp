@@ -12,7 +12,7 @@ import unipr.luc_af.chronotracker.R;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.holders.ListViewHolder;
-import unipr.luc_af.services.Database;
+import unipr.luc_af.chronotracker.helpers.Database;
 
 public class AthleteAdapter extends RecyclerView.Adapter<ListViewHolder> {
     private AthleteListItemClick mItemClick = (view,item) -> {};

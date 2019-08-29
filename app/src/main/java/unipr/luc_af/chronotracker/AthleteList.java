@@ -19,8 +19,8 @@ import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.TitleBarModel;
-import unipr.luc_af.services.Database;
-import unipr.luc_af.services.Utils;
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 
 public class AthleteList extends Fragment {
     private String SCROLL_POS = "scroll_pos";

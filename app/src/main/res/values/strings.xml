@@ -34,4 +34,5 @@
     <string name="select_activity">Select a sport</string>
     <string name="reset">Reset</string>
     <string name="chrono_tracker_title">Chronometer</string>
+    <string name="notification_title">Chrono Training</string>
 </resources>

@@ -23,8 +23,8 @@ import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
-import unipr.luc_af.services.Database;
-import unipr.luc_af.services.Utils;
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 
 public class AthleteActivities extends Fragment {
     private TitleBarModel mTitleModel;

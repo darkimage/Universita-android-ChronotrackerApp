@@ -18,7 +18,7 @@ import unipr.luc_af.classes.Lap;
 import unipr.luc_af.components.ChronoView;
 import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.TitleBarModel;
-import unipr.luc_af.services.Utils;
+import unipr.luc_af.chronotracker.helpers.Utils;
 
 
 public class ChronoTracker extends Fragment {
@@ -49,7 +49,7 @@ public class ChronoTracker extends Fragment {
         mStopToStartAnim = (AnimatedVectorDrawable)getActivity().getDrawable(R.drawable.start_to_pause_anim);
 
         mChronometer = view.findViewById(R.id.tracker_chronometer);
-        mChronometer.setOnStateChangeListener((state,chrono) -> setActionStatus(state));
+        mChronometer.setOnStateChangeListener((state, chrono) -> setActionStatus(state));
         mChronometer.setOnLapListener((duration, fromStart) -> {
             mLaps.add(0,new Lap(duration,fromStart));
             updateLaps();
@@ -89,7 +89,7 @@ public class ChronoTracker extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        mChronometer.Pause();
+//        mChronometer.Pause();
         mActivitiSessionModel.setSessionStartData(null);
     }
 
@@ -99,16 +99,16 @@ public class ChronoTracker extends Fragment {
         mLapsList.invalidate();
     }
 
-    private void setActionStatus(ChronoView.State state){
-        if(state == ChronoView.State.PAUSE){
+    private void setActionStatus(ChronoView.ChronoData.State state){
+        if(state == ChronoView.ChronoData.State.PAUSE){
             mResetButton.setEnabled(true);
             mLapButton.setEnabled(false);
         }
-        if(state == ChronoView.State.TRACK){
+        if(state == ChronoView.ChronoData.State.TRACK){
             mLapButton.setEnabled(true);
             mResetButton.setEnabled(false);
         }
-        if(state == ChronoView.State.RESET) {
+        if(state == ChronoView.ChronoData.State.RESET) {
             mLapButton.setEnabled(false);
             mResetButton.setEnabled(false);
             mLaps.clear();
@@ -116,4 +116,9 @@ public class ChronoTracker extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mChronometer.Stop();
+    }
 }

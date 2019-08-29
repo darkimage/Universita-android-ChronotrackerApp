@@ -16,8 +16,8 @@ import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
-import unipr.luc_af.services.Database;
-import unipr.luc_af.services.Utils;
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.root_toolbar);
         setSupportActionBar(myToolbar);
-
 
         if(savedInstanceState == null) {
             //Aggiungiamo il layout iniziale AthleteList se non stiamo ritornando da uno state change

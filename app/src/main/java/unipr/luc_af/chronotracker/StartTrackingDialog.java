@@ -35,8 +35,8 @@ import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
-import unipr.luc_af.services.Database;
-import unipr.luc_af.services.Utils;
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 
 public class StartTrackingDialog extends DialogFragment {
     private String SAVED_ACTIVITY_ID = "activity_id";

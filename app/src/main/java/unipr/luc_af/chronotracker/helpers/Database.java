@@ -1,14 +1,12 @@
-package unipr.luc_af.services;
+package unipr.luc_af.chronotracker.helpers;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.Athlete;
