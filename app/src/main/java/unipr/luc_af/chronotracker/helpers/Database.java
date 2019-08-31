@@ -8,11 +8,14 @@ import android.os.AsyncTask;
 
 import java.util.Calendar;
 
+import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.NoLeakAsyncTask;
+import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.database.DatabaseHelper;
 import unipr.luc_af.database.AppTables;
+import unipr.luc_af.database.interfaces.DatabaseError;
 import unipr.luc_af.database.interfaces.DatabaseInsert;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 
@@ -54,6 +57,67 @@ public class Database {
         values.put(AppTables.ACTIVITY_TYPE_TABLE_COL_0.getName(), name);
         values.put(AppTables.ACTIVITY_TYPE_TABLE_COL_1.getName(), activity);
         return db.insertOrThrow(AppTables.ACTIVITY_TYPE_TABLE.getName(), null, values);
+    }
+
+    public void addSession(ActivitySession session, DatabaseInsert result, DatabaseError error){
+        NoLeakAsyncTask<Void,Void,Long> task = new NoLeakAsyncTask<>(
+            mContext,
+            (Void... voids) ->{
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                db.beginTransaction();
+                values.put(AppTables.SESSION_TABLE_COL_0.getName(), session.athlete);
+                values.put(AppTables.SESSION_TABLE_COL_1.getName(), session.activity);
+                values.put(AppTables.SESSION_TABLE_COL_2.getName(), session.activityType);
+                values.put(AppTables.SESSION_TABLE_COL_3.getName(), session.startTime);
+                values.put(AppTables.SESSION_TABLE_COL_4.getName(), session.stopTime);
+                values.put(AppTables.SESSION_TABLE_COL_5.getName(), session.distance);
+                values.put(AppTables.SESSION_TABLE_COL_6.getName(), session.speed);
+                long insertResult = db.insertOrThrow(AppTables.SESSION_TABLE.getName(),null, values);
+
+                for (int i = 0; i < session.laps.length; i++) {
+                    ContentValues lap_values = new ContentValues();
+                    lap_values.put(AppTables.LAP_TABLE_COL_0.getName(), session.laps[i].fromStart);
+                    lap_values.put(AppTables.LAP_TABLE_COL_1.getName(), session.laps[i].duration);
+                    lap_values.put(AppTables.LAP_TABLE_COL_2.getName(), insertResult);
+                    db.insertOrThrow(AppTables.LAP_TABLE.getName(),null, lap_values);
+                }
+
+                db.setTransactionSuccessful();
+                return insertResult;
+            },
+            (id) -> result.OnInsert(id),
+            (e) -> error.OnError((SQLException) e),
+            (e) -> {
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                db.endTransaction();
+            },
+            () -> {
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                db.endTransaction();
+            }
+        );
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void getLapsOfSession(ActivitySession session, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+                mContext,
+                (Void... voids) ->{
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    Utils utils = Utils.getInstance();
+                    Cursor queryResult = db.query(AppTables.LAP_TABLE.getName(),
+                            new String[0],
+                            utils.concatString(" ", AppTables.LAP_TABLE_COL_2.getName(),"=",session.id.toString()),
+                            null,
+                            null,
+                            null,
+                            null);
+                    return queryResult;
+                },
+                (cursor) -> {result.OnResult(cursor);}
+        );
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void getActivitiesTypesOfActivity(ActivitySport activity, DatabaseResult result){
@@ -123,6 +187,28 @@ public class Database {
                 },
                 (cursor) -> { result.OnResult(cursor); }
                 );
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void getActivityFromId(Long id, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(
+                mContext,
+                (Void... in) -> {
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    Utils utils = Utils.getInstance();
+                    Cursor queryCursor = db.query(AppTables.ACTIVITY_TABLE.getName(),
+                            new String[0],
+                            utils.concatString(" ",
+                                    AppTables.TABLE_ID_COL.getName(), "=", id.toString()),
+                            null,
+                            null,
+                            null,
+                            null,
+                            "1");
+                    return queryCursor;
+                },
+                (cursor) -> { result.OnResult(cursor); }
+        );
         task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -219,11 +305,30 @@ public class Database {
                         null,
                         null,
                         null,
-                        null,
-                        "1");
+                        null);
                 return queryCursor;
             },
             (cursor) -> {result.OnResult(cursor);});
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void getMeasureUnitFromId(Long id, DatabaseResult result){
+        NoLeakAsyncTask<Void,Void,Cursor> task = new NoLeakAsyncTask<>(mContext,
+                (Void... in) ->{
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    Utils utils = Utils.getInstance();
+                    Cursor queryCursor = db.query(AppTables.UNIT_TABLE.getName(),
+                            new String[0],
+                            utils.concatString( " ",
+                                    AppTables.TABLE_ID_COL.getName(), "=", id.toString()),
+                            null,
+                            null,
+                            null,
+                            null,
+                            "1");
+                    return queryCursor;
+                },
+                (cursor) -> result.OnResult(cursor));
         task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

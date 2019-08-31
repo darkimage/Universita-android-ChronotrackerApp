@@ -1,16 +1,17 @@
 package unipr.luc_af.classes;
 
 public class ActivitySession {
-    public Long id = new Long(-1);
+    public Long id;
     public Long athlete;
     public Long activity;
     public Long activityType;
-    public Long startTime = new Long(-1);
-    public Long stopTime = new Long(-1);
+    public Long startTime;
+    public Long stopTime;
     public Long distance;
-    public Integer speed = new Integer(-1);
+    public Integer speed;
+    public Lap[] laps;
 
-    ActivitySession(Long athleteReference,
+    public ActivitySession(Long athleteReference,
                     Long activityReference,
                     Long activityTypeReference,
                     Long distanceReference){
@@ -20,21 +21,23 @@ public class ActivitySession {
         distance = distanceReference;
     }
 
-    ActivitySession(Long activityId,
-                    Long athleteReference,
-                    Long activityReference,
-                    Long activityTypeReference,
-                    Long start_time,
-                    Long stop_time,
-                    Long distanceReference,
-                    Integer activitySpeed){
+    public ActivitySession(Long activityId,
+                    Long athleteRef,
+                    Long activityRef,
+                    Long activityTypeRef,
+                    Long startTimeRef,
+                    Long stopTimeRef,
+                    Long distanceRef,
+                    Integer speedRef,
+                    Lap[] lapsRef){
         id = activityId;
-        athlete = athleteReference;
-        activity = activityReference;
-        activityType = activityTypeReference;
-        startTime = start_time;
-        stopTime = stop_time;
-        distance = distanceReference;
-        speed = activitySpeed;
+        athlete = athleteRef;
+        activity = activityRef;
+        activityType = activityTypeRef;
+        startTime = startTimeRef;
+        stopTime = stopTimeRef;
+        distance = distanceRef;
+        speed = speedRef;
+        laps = lapsRef;
     }
 }

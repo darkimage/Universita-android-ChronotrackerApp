@@ -1,17 +1,25 @@
 package unipr.luc_af.chronotracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import com.google.android.material.snackbar.Snackbar;
+
+import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.StartSessionData;
+import unipr.luc_af.components.ChronoView;
+import unipr.luc_af.database.interfaces.DatabaseInsert;
 import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
@@ -26,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private PopupItemsModel mPopupItemsModel;
     private ActivitySessionModel mActivitiesSessionModel;
     private int[] mPopupActiveItems = new int[0];
+    private ActivitySession mCurrentSessionData = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -35,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.root_toolbar);
         setSupportActionBar(myToolbar);
-
         if(savedInstanceState == null) {
             //Aggiungiamo il layout iniziale AthleteList se non stiamo ritornando da uno state change
             //in quel caso lo abbiamo gia sostituito con altri fragments
@@ -56,9 +64,15 @@ public class MainActivity extends AppCompatActivity {
 
         final Observer<String> titleObserver = (title) -> getSupportActionBar().setTitle(title);
         final Observer<Athlete> athleteObserver = (athlete) -> addAthlete(athlete);
-        final Observer<StartSessionData> startSessionDataObserver = (data) -> showTracker(data);
+        final Observer<StartSessionData> startSessionDataObserver = (data) -> {
+            if(data != null) {
+                showTracker(data);
+            }
+        };
+        final Observer<ActivitySession> activitySessionObserver = (data) -> mCurrentSessionData = data;
 
-        mActivitiesSessionModel.getSessionStartData().observe(this,startSessionDataObserver);
+        mActivitiesSessionModel.getStartSession().observe(this,startSessionDataObserver);
+        mActivitiesSessionModel.getActivitySession().observe(this,activitySessionObserver);
         mAthleteModel.getAthlete().observe(this, athleteObserver);
         mTitleModel.getTitle().observe(this, titleObserver);
         mPopupItemsModel.getActiveItems().observe(this, popupItemsObserver);
@@ -83,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_start_tracking:
                 return onStartTrackingClicked();
+            case R.id.menu_tracking_done:
+                return onFinishTrackingClicked();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -120,6 +136,13 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private boolean onFinishTrackingClicked(){
+        if(mCurrentSessionData != null){
+            mActivitiesSessionModel.setEndSession(mCurrentSessionData);
+        }
+        return true;
+    }
+
     private void addAthlete(Athlete athlete){
         Database.getInstance().addAthlete(athlete, (id) -> {
             if(id != -1){
@@ -150,14 +173,4 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-//        FragmentManager manager = getSupportFragmentManager();
-//        FragmentManager.BackStackEntry backEntry = manager.getBackStackEntryAt(manager.getBackStackEntryCount() -1);
-//        tag = backEntry.getName();
-//        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-//        manager.beginTransaction()
-//            .replace(R.id.root,fragment)
-//            .commit();
-    }
 }

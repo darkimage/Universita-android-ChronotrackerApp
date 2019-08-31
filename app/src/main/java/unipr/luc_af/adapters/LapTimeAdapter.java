@@ -44,13 +44,23 @@ public class LapTimeAdapter extends RecyclerView.Adapter<ListViewHolder> {
         durationText.setText(mContext.getString(R.string.duration_placeholder, formatTime(currentLap.duration) ));
     }
 
+    public void setLaps(Lap[] laps){
+        mLaps = laps;
+    }
+
     private String formatTime(long time){
-        return String.format(
-                "%02d:%02d:%02d.%03d",
-                TimeUnit.MILLISECONDS.toHours(time),
-                TimeUnit.MILLISECONDS.toMinutes(time) % 60,
-                TimeUnit.MILLISECONDS.toSeconds(time) % 60,
-                time % 1000);
+        long hours = TimeUnit.MILLISECONDS.toHours(time);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(time) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(time) % 60;
+        if(hours != 0) {
+            return String.format(
+                    "%02d:%02d:%02d.%03d",
+                    hours, minutes, seconds, time % 1000);
+        }else{
+            return String.format(
+                    "%02d:%02d.%03d",
+                    minutes, seconds, time % 1000);
+        }
     }
 
     @Override

@@ -123,9 +123,10 @@ public class StartTrackingDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle(R.string.start_tracking_header)
                 .setPositiveButton("Start",
-                (dialog,whichButton) -> {
+                (dialog, whichButton) -> {
                     StartSessionData data = new StartSessionData(mCurrentAthlete,mSelectedActivity,mSelectedActivityType);
                     mActivitySessionModel.setSessionStartData(data);
+                    mActivitySessionModel.setStartSession(data);
                     this.dismiss();
                 })
                 .setNegativeButton("Cancel",

@@ -21,4 +21,11 @@
         android:icon="@drawable/ic_stopwatch_solid"
         android:visible="false"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menu_tracking_done"
+        android:title="@string/done"
+        android:visible="false"
+        android:icon="@drawable/ic_check_solid"
+        app:showAsAction="always"/>
 </menu>

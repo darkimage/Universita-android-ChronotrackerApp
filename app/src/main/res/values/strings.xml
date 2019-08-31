@@ -35,4 +35,13 @@
     <string name="reset">Reset</string>
     <string name="chrono_tracker_title">Chronometer</string>
     <string name="notification_title">Chrono Training</string>
+    <string name="notification_text_title">Training %1$s</string>
+    <string name="notification_last_lap">Last lap</string>
+    <string name="notification_action_goto">Go to tracker</string>
+    <string name="chrono_state_pause">paused</string>
+    <string name="chrono_state_tracking">in progress</string>
+    <string name="chrono_state_reset">not started</string>
+    <string name="chrono_state_touch_message">Touch here to continue your training</string>
+    <string name="no_laps">No laps</string>
+    <string name="done">Done</string>
 </resources>

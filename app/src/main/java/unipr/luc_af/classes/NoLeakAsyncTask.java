@@ -9,7 +9,9 @@ public class NoLeakAsyncTask<I,P,R> extends AsyncTask<I,P,R> {
     private BackgroundTask<I,R> mTask;
     private PostTask<R> mPostTask;
     private ErrorTask mErrorTask;
+    private ThreadErrorTask mThreadErrorTask;
     private Exception mTaskException;
+    private ThreadPostTask mThreadPostTask;
 
     public NoLeakAsyncTask(Activity context, BackgroundTask<I,R> task){
         mActivityWeakReference = new WeakReference<>(context);
@@ -29,13 +31,37 @@ public class NoLeakAsyncTask<I,P,R> extends AsyncTask<I,P,R> {
         mErrorTask = errorTask;
     }
 
+    public NoLeakAsyncTask(Activity context, BackgroundTask<I,R> task, PostTask<R> postTask, ErrorTask errorTask, ThreadPostTask threadPostTask){
+        mActivityWeakReference = new WeakReference<>(context);
+        mTask = task;
+        mPostTask = postTask;
+        mErrorTask = errorTask;
+        mThreadPostTask = threadPostTask;
+    }
+
+    public NoLeakAsyncTask(Activity context, BackgroundTask<I,R> task, PostTask<R> postTask, ErrorTask errorTask, ThreadErrorTask threadErrorTask, ThreadPostTask threadPostTask){
+        mActivityWeakReference = new WeakReference<>(context);
+        mTask = task;
+        mPostTask = postTask;
+        mErrorTask = errorTask;
+        mThreadErrorTask = threadErrorTask;
+        mThreadPostTask = threadPostTask;
+    }
+
     @Override
     protected R doInBackground(I... is) {
         try {
             return mTask.executeTask(is);
         }catch (Exception error){
             mTaskException = error;
+            if(mThreadErrorTask != null){
+                mThreadErrorTask.executeTask(error);
+            }
             return null;
+        }finally {
+            if(mThreadPostTask != null){
+                mThreadPostTask.executeTask();
+            }
         }
     }
 
@@ -62,6 +88,14 @@ public class NoLeakAsyncTask<I,P,R> extends AsyncTask<I,P,R> {
     }
 
     public interface ErrorTask{
-        void executeTask(Exception error);
+        void executeTask(Throwable error);
+    }
+
+    public interface ThreadErrorTask{
+        void executeTask(Throwable error);
+    }
+
+    public interface ThreadPostTask{
+        void executeTask();
     }
 }
