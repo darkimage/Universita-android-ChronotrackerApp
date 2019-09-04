@@ -2,10 +2,15 @@ package unipr.luc_af.chronotracker;
 
 import android.database.Cursor;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,42 +28,70 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
 
 public class AthleteAdd extends Fragment {
+    private String ATHLETE_TAG = "athlete_tag";
     private String ATHLETE_NAME = "athlete_name";
     private String ATHLETE_SURNAME = "athlete_surname";
     private String ATHLETE_ACTIVITY = "athlete_activity";
+
+    //LOGIC
     private TitleBarModel mTitleModel;
     private AthleteModel mAthleteModel;
+    private Athlete mAthlete;
 
+    //UI
     private EditText mAthleteNameText;
     private EditText mAthleteSurnameText;
-    private TextView mAthleteActivity;
+    private AutoCompleteTextView mAthleteActivity;
 
     private AwesomeValidation mValidator; //validator
     public AthleteAdd() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View fragView = inflater.inflate(R.layout.fragment_add_athlete, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_athlete, container, false);
         Utils.getInstance().setToolBarNavigation((AppCompatActivity)getActivity());
-        //Add the click listener to the button
-        fragView.findViewById(R.id.add_button).setOnClickListener((view) -> Commit());
-        return fragView;
+        SetUpModels(savedInstanceState);
+        SetUpUi(view,savedInstanceState);
+        return view;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void SetUpModels(Bundle savedInstanceState){
+        mTitleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
+        mTitleModel.setTitle(getActivity().getResources().getString(R.string.add_athlete));
+        mAthleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
+        //Ricaviamo i dati per popolare il dropdown menu dal database
+    }
+
+
+    private void SetUpUi(View view, Bundle savedInstanceState){
+        view.findViewById(R.id.add_button).setOnClickListener((v) -> Commit());
+
         //Inizializziamo i reference per degli input del form per la validazione
-        mAthleteNameText = getView().findViewById(R.id.athlete_name);
-        mAthleteSurnameText = getView().findViewById(R.id.athlete_surname);
-        mAthleteActivity = getView().findViewById(R.id.athlete_activity);
+        TextWatcher updateAthleteWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                updateAthleteReference();
+            }
+        };
+
+        mAthleteNameText = view.findViewById(R.id.athlete_name);
+        mAthleteNameText.addTextChangedListener(updateAthleteWatcher);
+        mAthleteSurnameText = view.findViewById(R.id.athlete_surname);
+        mAthleteSurnameText.addTextChangedListener(updateAthleteWatcher);
+        mAthleteActivity = view.findViewById(R.id.athlete_activity);
+        mAthleteActivity.addTextChangedListener(updateAthleteWatcher);
 
         //inizializiomo il validatore
         mValidator = new AwesomeValidation(ValidationStyle.UNDERLABEL);
@@ -67,21 +100,41 @@ public class AthleteAdd extends Fragment {
         mValidator.addValidation(getActivity(), R.id.athlete_name, "^[A-Za-z\\s]+",R.string.athlete_name_error);
         mValidator.addValidation(getActivity(), R.id.athlete_surname, "^[A-Za-z\\s]+",R.string.athlete_surname_error);
         mValidator.addValidation(getActivity(), R.id.athlete_activity, "^[A-Za-z\\s]+",R.string.athlete_activity_error);
-    }
 
-
-    @Override
-    public synchronized void onStart() {
-        super.onStart();
-        //Aggiorniamo la actionbar title
-        mTitleModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
-        mTitleModel.setTitle(getActivity().getResources().getString(R.string.add_athlete));
-
-        mAthleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
-
-        //Ricaviamo i dati per popolare il dropdown menu dal database
         DatabaseResult activitiesResult = (Cursor cursor) -> setDropdownOptions(cursor);
         Database.getInstance().getActivityNames(activitiesResult);
+
+        if(savedInstanceState != null){
+            mAthleteNameText.setText(mAthlete.name);
+            mAthleteSurnameText.setText(mAthlete.surname);
+            DatabaseResult activityIdResult = (cursor1) -> {
+                cursor1.moveToNext();
+                mAthleteActivity.setText(cursor1.getString(1));
+                mAthleteActivity.showDropDown();
+            };
+            Database.getInstance().getActivityFromId(mAthlete.activityReference, activityIdResult);
+        }
+    }
+
+    private interface AthleteUpdateListener {
+        void onUpdate(Athlete athlete);
+    }
+
+    private void updateAthleteReference(){
+        updateAthleteReference((a)->{});
+    }
+
+    private void updateAthleteReference(AthleteUpdateListener athleteUpdate){
+        DatabaseResult activityResult = (cursor) -> {
+            if(cursor.moveToFirst()) {
+                mAthlete = new Athlete(new Long(-1),
+                        mAthleteNameText.getText().toString(),
+                        mAthleteSurnameText.getText().toString(),
+                        cursor.getLong(0));
+                athleteUpdate.onUpdate(mAthlete);
+            }
+        };
+        Database.getInstance().getActivityIdFromName(mAthleteActivity.getText().toString(), activityResult);
     }
 
     private void setDropdownOptions(Cursor cursor){
@@ -91,42 +144,28 @@ public class AthleteAdd extends Fragment {
                 result[i] = cursor.getString(0);
                 cursor.moveToNext();
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_menu_item, result);
-            AutoCompleteTextView editTextFilledExposedDropdown = getActivity().findViewById(R.id.athlete_activity);
-            editTextFilledExposedDropdown.setAdapter(adapter);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_item, result);
+            mAthleteActivity.setAdapter(adapter);
         }
     }
 
     private void Commit(){
         if(mValidator.validate()){
-            DatabaseResult activityResult = (cursor) -> {
-                if(cursor.moveToFirst()) {
-                    Athlete athlete = new Athlete(new Long(-1),
-                            mAthleteNameText.getText().toString(),
-                            mAthleteSurnameText.getText().toString(),
-                            cursor.getLong(0));
-                    mAthleteModel.addAthlete(athlete);
-                }
-            };
-            Database.getInstance().getActivityIdFromName(mAthleteActivity.getText().toString(), activityResult);
+            updateAthleteReference((athlete) -> mAthleteModel.addAthlete(athlete));
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putCharSequence(ATHLETE_NAME, mAthleteNameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_SURNAME, mAthleteSurnameText.getText());
-        savedInstanceState.putCharSequence(ATHLETE_ACTIVITY, mAthleteActivity.getText());
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if(savedInstanceState != null) {
-            mAthleteNameText.setText(savedInstanceState.getCharSequence(ATHLETE_NAME));
-            mAthleteSurnameText.setText(savedInstanceState.getCharSequence(ATHLETE_SURNAME));
-            mAthleteActivity.setText(savedInstanceState.getCharSequence(ATHLETE_ACTIVITY));
+            mAthlete = savedInstanceState.getParcelable(ATHLETE_TAG);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelable(ATHLETE_TAG, mAthlete);
     }
 }

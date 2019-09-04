@@ -3,29 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout"
+    android:id="@+id/chrono_tracker_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     tools:context=".MainActivity">
 
-<androidx.appcompat.widget.Toolbar
-    android:id="@+id/root_toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/colorPrimary"
-    android:elevation="10dp"
-    android:theme="@style/Theme.MaterialComponents.Toolbar"
-    app:popupTheme="@style/Theme.MaterialComponents.Toolbar.Popup"/>
-
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:id="@+id/root_coordinator_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <FrameLayout
-        android:id="@+id/root"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/root_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:elevation="10dp"
+        android:theme="@style/Theme.MaterialComponents.Toolbar"
+        app:popupTheme="@style/Theme.MaterialComponents.Toolbar.Popup"/>
+
+    <FrameLayout
+        android:id="@+id/toolbar_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/root_coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>

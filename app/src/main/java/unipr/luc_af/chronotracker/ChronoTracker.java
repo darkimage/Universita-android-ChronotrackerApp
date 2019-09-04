@@ -1,21 +1,28 @@
 package unipr.luc_af.chronotracker;
 
 
-import android.content.res.Configuration;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import unipr.luc_af.adapters.LapTimeAdapter;
 import unipr.luc_af.chronotracker.helpers.Database;
 import unipr.luc_af.classes.ActivitySession;
@@ -30,8 +37,11 @@ import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
 import unipr.luc_af.chronotracker.helpers.Utils;
 
+import static unipr.luc_af.chronotracker.MainActivity.TRACKER_TAG;
+
 public class ChronoTracker extends Fragment {
-    public static final String PLAY_BUTTON_STATE = "play_btn_state";
+    private static final String PLAY_BUTTON_STATE = "play_btn_state";
+    private static final String SESSION_STATE = "session_state";
     private ImageButton mLapButton;
     private ImageButton mResetButton;
     private TitleBarModel mTitleBarModel;
@@ -40,15 +50,17 @@ public class ChronoTracker extends Fragment {
     private ActivitySessionModel mActivitySessionModel;
     private PopupItemsModel mPopupItemsModel;
     private RecyclerView mLapsList;
-    private ArrayList<Lap> mLaps = new ArrayList<>();
+    private ArrayList<Lap> mLaps;
     private LapTimeAdapter mLapTimeAdapter;
     private AnimatedVectorDrawable mStartToStopAnim;
     private AnimatedVectorDrawable mStopToStartAnim;
     private Boolean startStopButtonState = false;
     private StartSessionData mStartSessionData;
     private ActivitySession mActivitySession;
-    private MeasureUnit mMeasureUnit;
+    private MeasureUnit[] mMeasureUnits;
+    private Button mUnitButton;
     private boolean isSessionEnded = false;
+    private TextView mUnitText;
 
     public ChronoTracker() {
         // Required empty public constructor
@@ -60,13 +72,44 @@ public class ChronoTracker extends Fragment {
         // Inflate the layout for this fragment
         Utils.getInstance().setToolBarNavigation((AppCompatActivity)getActivity());
         View view = inflater.inflate(R.layout.fragment_chrono_tracker, container, false);
+
+        setUpModels(savedInstanceState);
+        setUpUi(view,savedInstanceState);
+        return view;
+    }
+
+
+    private void setUpModels(Bundle saveInstanceState){
+        mLaps = new ArrayList<>();
+        mTitleBarModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
+        mTitleBarModel.setTitle(getActivity().getString(R.string.chrono_tracker_title));
+        mActivitySessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
+        mPopupItemsModel = new ViewModelProvider(getActivity()).get(PopupItemsModel.class);
+        mPopupItemsModel.setActiveItems(new int[]{R.id.menu_tracking_done});
+
+        if(saveInstanceState != null){
+            mActivitySession = saveInstanceState.getParcelable(SESSION_STATE);
+            mLaps = new ArrayList<>(Arrays.asList(mActivitySession.laps));
+        }else {
+            mActivitySessionModel.getStartSession().observe(getActivity(), (data) -> {
+                if(data != null) {
+//                    mStartSessionData = data;
+                    mActivitySession = constructSession(data);
+                }
+            });
+        }
+
+        mActivitySessionModel.getEndSession().observe(getActivity(), (data) -> finishSession(data));
+    }
+
+    private void setUpUi(View view, Bundle savedInstanceState){
         mStopToStartAnim = (AnimatedVectorDrawable)getActivity().getDrawable(R.drawable.pause_to_start_anim);
         mStartToStopAnim = (AnimatedVectorDrawable)getActivity().getDrawable(R.drawable.start_to_pause_anim);
 
         mChronometer = view.findViewById(R.id.tracker_chronometer);
         if(savedInstanceState == null){
             mChronometer.init();
-        }else {
+        }else{
             mChronometer.bindToService();
             startStopButtonState = savedInstanceState.getBoolean(PLAY_BUTTON_STATE);
         }
@@ -75,13 +118,19 @@ public class ChronoTracker extends Fragment {
             mLaps.add(0,new Lap(duration,fromStart));
             updateLaps();
         });
+        mChronometer.setOnServiceConnectedListener((service) ->
+                setOnApplicationClosed(service)
+        );
 
         mLapsList = view.findViewById(R.id.tracker_laps);
         mLapsList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mLapTimeAdapter = new LapTimeAdapter(new Lap[0], getActivity());
+        if(mLaps != null) {
+            mLapTimeAdapter.setLaps(getLapsArray());
+        }
         mLapsList.setAdapter(mLapTimeAdapter);
 
-        mLapButton = view.findViewById(R.id.tracker_lap);
+        mLapButton = view.findViewById(R.id.toolbar_tracker_lap_btn);
         mLapButton.setEnabled(false);
         mLapButton.setOnClickListener((v) -> mChronometer.Lap());
 
@@ -91,65 +140,107 @@ public class ChronoTracker extends Fragment {
 
         mStartStopButton = view.findViewById(R.id.chronoview_start_stop_fab);
         mStartStopButton.setOnClickListener((v) -> {
-            if(!startStopButtonState){
+            if(!startStopButtonState)
                 mChronometer.Start();
-//                mStartStopButton.setImageDrawable(mStopToStartAnim);
-            }else{
+            else
                 mChronometer.Pause();
-//                mStartStopButton.setImageDrawable(mStartToStopAnim);
-            }
-//            ((AnimatedVectorDrawable)mStartStopButton.getDrawable()).start();
-            startStopButtonState = !startStopButtonState;
+//            startStopButtonState = !startStopButtonState;
         });
 
-        mTitleBarModel = new ViewModelProvider(getActivity()).get(TitleBarModel.class);
-        mTitleBarModel.setTitle(getActivity().getString(R.string.chrono_tracker_title));
-        mActivitySessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
-        mPopupItemsModel = new ViewModelProvider(getActivity()).get(PopupItemsModel.class);
-        mPopupItemsModel.setActiveItems(new int[]{R.id.menu_tracking_done});
-
-
-        mActivitySessionModel.getSessionStartData().observe(getActivity(), (data) -> {
-            if(data != null) {
-                mStartSessionData = data;
-                mActivitySession = constructSession(data);
+        mActivitySessionModel.getRestoreSession().observe(getActivity(), (data) -> {
+            if(data != null){
+                mActivitySession = data;
+                if(mActivitySession.laps != null)
+                    mLaps = new ArrayList<>(Arrays.asList(mActivitySession.laps));
+                setLaps(mActivitySession.laps);
+                mActivitySessionModel.setActivitySession(mActivitySession);
+                initUnitButton(savedInstanceState, mActivitySession.distance);
             }
+            mActivitySessionModel.getRestoreSession().removeObservers(getActivity());
         });
 
-        mActivitySessionModel.getEndSession().observe(getActivity(), (data) ->{
-            if(data != null) {
-                isSessionEnded = true;
-                mChronometer.Stop();
-                updateSession(mStartSessionData);
-                DatabaseInsert addSessionResult = (res) -> {
-                    //add snackbar and change to activities list
-                    getActivity().getSupportFragmentManager().popBackStack();
-                };
-                Database.getInstance().addSession(data, addSessionResult, (e) -> {
-                    System.out.println(e.getLocalizedMessage());
-                });
-                mActivitySessionModel.setEndSession(null);
-            }
-        });
+        mUnitButton = view.findViewById(R.id.tracker_unit_button);
+        mUnitText = view.findViewById(R.id.tracker_unit_text);
+        mUnitButton.setOnClickListener((v) -> toggleUnits() );
 
-        DatabaseResult unitResult = (cursor) -> {
+        initUnitButton(savedInstanceState, null);
+    }
+
+    private void initUnitButton(Bundle savedInstanceState, Long unit){
+        DatabaseResult unitsResult = (cursor) -> {
             cursor.moveToNext();
-            mMeasureUnit = new MeasureUnit(cursor.getLong(0), cursor.getString(1), cursor.getString(2));
+            mMeasureUnits = new MeasureUnit[cursor.getCount()];
+            for (int i = 0; i < cursor.getCount(); i++) {
+                mMeasureUnits[i] = new MeasureUnit(cursor.getLong(0),cursor.getString(1),cursor.getString(2));
+                cursor.moveToNext();
+            }
+            if(savedInstanceState == null && unit == null){
+                setUnitButton(mMeasureUnits[0]);
+            }else if(savedInstanceState != null){
+                setUnitButton(mActivitySession.distance);
+            }else{
+                setUnitButton(unit);
+            }
         };
-        Database.getInstance().getMeasureUnitFromId((long)1,unitResult);
+        Database.getInstance().getMeasureUnits(unitsResult);
+    }
 
-        return view;
+    private void setUnitButton(Long id){
+        DatabaseResult unitResult = (cursor) ->{
+            cursor.moveToNext();
+            MeasureUnit measureUnit = new MeasureUnit(cursor.getLong(0),cursor.getString(1),cursor.getString(2));
+            setUnitButton(measureUnit);
+        };
+        Database.getInstance().getMeasureUnitFromId(id,unitResult);
+    }
+
+    private void setUnitButton(MeasureUnit unit){
+        mUnitButton.setText(unit.shortName);
+        mUnitButton.setTag(unit);
+        mUnitText.setText(unit.name);
+    }
+
+    private void toggleUnits(){
+        MeasureUnit currentUnit = (MeasureUnit) mUnitButton.getTag();
+        MeasureUnit nextUnit = mMeasureUnits[(int)(currentUnit.id % (mMeasureUnits.length))];
+        setUnitButton(nextUnit);
+        updateSession();
+    }
+
+    private void setOnApplicationClosed(ChronoView.ChronoService service) {
+        service.setOnTaskRemoved(() -> {
+            mChronometer.Pause();
+            mChronometer.stopChronoService();
+            isSessionEnded = true;
+            updateSession();
+            Database.getInstance().addSession(mActivitySession, (res) -> { }, (e) -> {
+                System.out.println(e.getLocalizedMessage());
+            });
+            mActivitySessionModel.setEndSession(null);
+        });
+    }
+
+    private void setLaps(Lap[] laps){
+        mLapTimeAdapter.setLaps(laps);
+        mLapTimeAdapter.notifyDataSetChanged();
+        mActivitySession.laps = laps;
     }
 
     private void updateLaps(){
         mLapTimeAdapter.setLaps(getLapsArray());
+//        mActivitySessionModel.setSessionLaps(getLapsArray());
         mLapTimeAdapter.notifyItemInserted(0);
         mLapsList.scrollToPosition(0);
+        mActivitySession.laps = getLapsArray();
+        mActivitySessionModel.setActivitySession(mActivitySession);
     }
 
     private void resetLaps(){
+//        mActivitySessionModel.setSessionLaps(new Lap[0]);
         mLapTimeAdapter.setLaps(new Lap[0]);
         mLapTimeAdapter.notifyDataSetChanged();
+        mActivitySession.laps = new Lap[0];
+        mActivitySessionModel.setActivitySession(mActivitySession);
     }
 
     private Lap[] getLapsArray(){
@@ -163,44 +254,68 @@ public class ChronoTracker extends Fragment {
         mActivitySessionModel.setStartSession(null);
         outState.putBoolean(PLAY_BUTTON_STATE, startStopButtonState);
         isSessionEnded = false;
+        updateSession();
+        outState.putParcelable(SESSION_STATE, mActivitySession);
     }
 
-    private void updateSession(StartSessionData data){
-        mActivitySession.athlete = data.athlete.id;
-        mActivitySession.activity = data.activitySport.id;
-        mActivitySession.activityType = (data.activitySportType!= null) ? data.activitySportType.id : null;
-        mActivitySession.laps = getLapsArray();
-        mActivitySession.startTime = mChronometer.getData().initialTime;
-        mActivitySession.stopTime = mChronometer.getData().lastPausedTime;
-        mActivitySession.distance = (long)1;
-        mActivitySession.speed = 20;
-        mActivitySessionModel.setActivitySession(mActivitySession);
+    private void updateSession(){
+        if(mActivitySession != null) {
+            mActivitySession.laps = getLapsArray();
+            mActivitySession.startTime = mChronometer.getData().initialTime;
+            mActivitySession.stopTime = mChronometer.getData().lastPausedTime;
+            if(mUnitButton.getTag() != null) {
+                mActivitySession.distance = ((MeasureUnit) mUnitButton.getTag()).id;
+            }
+            mActivitySessionModel.setActivitySession(mActivitySession);
+        }
     }
 
     private ActivitySession constructSession(StartSessionData data){
-        return new ActivitySession(
-                data.athlete.id,
-                data.activitySport.id,
-                (data.activitySportType != null) ? data.activitySportType.id : null,
-                null);
+        ActivitySession session = new ActivitySession();
+        session.activity = data.activitySport.id;
+        session.athlete = data.athlete.id;
+        session.speed = 1;
+        session.activityType = (data.activitySportType != null) ? data.activitySportType.id : null;
+        mActivitySessionModel.setActivitySession(session);
+        return session;
+    }
+
+    private void finishSession(ActivitySession data){
+        if(data != null) {
+            isSessionEnded = true;
+            mChronometer.Stop();
+            updateSession();
+            DatabaseInsert addSessionResult = (res) -> {
+                //add snackbar and change to activities list
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
+            };
+            Database.getInstance().addSession(mActivitySession, addSessionResult, (e) -> {
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
+                System.out.println(e.getLocalizedMessage());
+            });
+            mActivitySessionModel.setEndSession(null);
+            mActivitySessionModel.setStartSession(null);
+        }
     }
 
     private void setActionStatus(ChronoView.ChronoData.State state){
         if(state == ChronoView.ChronoData.State.PAUSE){
+            startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
-            updateSession(mStartSessionData);
             mResetButton.setEnabled(true);
             mLapButton.setEnabled(false);
+            updateSession();
         }
         if(state == ChronoView.ChronoData.State.TRACK){
+            startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStartToStopAnim);
-            updateSession(mStartSessionData);
             mLapButton.setEnabled(true);
             mResetButton.setEnabled(false);
+            updateSession();
         }
         if(state == ChronoView.ChronoData.State.RESET) {
+            startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
-            updateSession(mStartSessionData);
             mLapButton.setEnabled(false);
             mResetButton.setEnabled(false);
             mLaps.clear();
@@ -209,6 +324,19 @@ public class ChronoTracker extends Fragment {
         ((AnimatedVectorDrawable)mStartStopButton.getDrawable()).start();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(!isSessionEnded) {
+            mActivitySessionModel.setToolbarSession(mActivitySession);
+        }
+        mActivitySessionModel.setRestoreSession(null);
+        mActivitySessionModel.getRestoreSession().removeObservers(getActivity());
+        mActivitySessionModel.setEndSession(null);
+        mActivitySessionModel.getEndSession().removeObservers(getActivity());
+        mActivitySessionModel.setStartSession(null);
+        mActivitySessionModel.getStartSession().removeObservers(getActivity());
+    }
 
     @Override
     public void onDestroy() {

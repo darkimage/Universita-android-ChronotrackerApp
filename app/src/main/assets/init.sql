@@ -15,4 +15,4 @@ INSERT INTO `unit`(id,name,short_name) VALUES
 (NULL, "Inches", "IN"),
 (NULL, "Foots", "FT"),
 (NULL, "Yards", "YD"),
-(NULL, "MILES", "MD");
+(NULL, "Miles", "MD");

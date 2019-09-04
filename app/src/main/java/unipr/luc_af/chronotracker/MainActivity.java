@@ -1,14 +1,11 @@
 package unipr.luc_af.chronotracker;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,8 +15,6 @@ import com.google.android.material.snackbar.Snackbar;
 import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.StartSessionData;
-import unipr.luc_af.components.ChronoView;
-import unipr.luc_af.database.interfaces.DatabaseInsert;
 import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
@@ -29,6 +24,13 @@ import unipr.luc_af.chronotracker.helpers.Utils;
 
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TRACKER_TAG = "tracker_tag";
+    public static final String ATHLETE_ACTIVITY_SUMMARY_TAG = "athelete_activity_summary_tag";
+    public static final String ATHLETE_LIST_TAG = "athlete_tag";
+    public static final String ATHLETE_ADD_TAG = "athlete_add_tag";
+    public static final String ATHLETE_ACTIVITIES_LIST_TAG = "athlete_activity_tag";
+    public static final String TOOLBAR_TRACKER_TAG = "toolbar_tracker_tag";
+
     private TitleBarModel mTitleModel;
     private AthleteModel mAthleteModel;
     private PopupItemsModel mPopupItemsModel;
@@ -49,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
             //in quel caso lo abbiamo gia sostituito con altri fragments
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.root, new AthleteList()).commit();
+                    .replace(R.id.root, new AthleteList(),ATHLETE_LIST_TAG)
+                    .commit();
         }
         //Action bar update observer usando un viewmodel
         mTitleModel = new ViewModelProvider(this).get(TitleBarModel.class);
@@ -69,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 showTracker(data);
             }
         };
-        final Observer<ActivitySession> activitySessionObserver = (data) -> mCurrentSessionData = data;
+        final Observer<ActivitySession> activitySessionObserver = (data) ->
+                mCurrentSessionData = data;
 
         mActivitiesSessionModel.getStartSession().observe(this,startSessionDataObserver);
         mActivitiesSessionModel.getActivitySession().observe(this,activitySessionObserver);
@@ -123,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
                             R.anim.horizontal_out_left,
                             R.anim.horizontal_in,
                             R.anim.horizontal_out)
-                    .replace(R.id.root, new ChronoTracker(),"tracker")
-                    .addToBackStack("tracker")
+                    .replace(R.id.root, new ChronoTracker(),TRACKER_TAG)
+                    .addToBackStack(TRACKER_TAG)
                     .commit();
             fragmentManager.executePendingTransactions();
         }
@@ -143,6 +147,20 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ChronoTracker tracker = (ChronoTracker) getSupportFragmentManager().findFragmentByTag(TRACKER_TAG);
+        if(tracker != null && tracker.isRemoving()){
+            if(mCurrentSessionData != null) {
+                ToolBarTracker toolBarTracker = new ToolBarTracker();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.toolbar_row, toolBarTracker, TOOLBAR_TRACKER_TAG)
+                        .commit();
+            }
+        }
+    }
+
     private void addAthlete(Athlete athlete){
         Database.getInstance().addAthlete(athlete, (id) -> {
             if(id != -1){
@@ -153,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
                                 R.anim.horizontal_out_left,
                                 R.anim.horizontal_in,
                                 R.anim.horizontal_out)
-                        .replace(R.id.root, new AthleteList(),"athlete_list")
-                        .addToBackStack("athlete_list")
+                        .replace(R.id.root, new AthleteList(),ATHLETE_LIST_TAG)
+                        .addToBackStack(ATHLETE_LIST_TAG)
                         .commit();
                 manager.executePendingTransactions();
                 View contextView = findViewById(R.id.root_coordinator_layout);

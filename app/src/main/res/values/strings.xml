@@ -8,13 +8,13 @@
     <string name="start">Start</string>
     <string name="add_athlete">Add new athlete</string>
     <string name="athlete_activities">activities</string>
-
+    <string name="activity_placeholder">Activity %1$s</string>
     <string name="athlete_name_error">Add a valid name</string>
     <string name="athlete_surname_error">Add a valid surname</string>
     <string name="athlete_activity_error">Select a valid sport from the list</string>
 
     <string name="athlete_list">Athletes list</string>
-
+    <string name="none">None</string>
     <string name="athlete_current">Current athlete:</string>
     <string name="athlete">Athlete</string>
     <string name="added">added</string>
@@ -44,4 +44,8 @@
     <string name="chrono_state_touch_message">Touch here to continue your training</string>
     <string name="no_laps">No laps</string>
     <string name="done">Done</string>
+    <string name="activity_summary">Activity summary</string>
+    <string name="laps">Laps</string>
+    <string name="sport">Sport</string>
+    <string name="session_duration">Total Duration</string>
 </resources>

@@ -3,6 +3,11 @@ package unipr.luc_af.chronotracker.helpers;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 public class Utils {
     private static Utils instance = null;
     private Utils () { }
@@ -56,5 +61,31 @@ public class Utils {
             fragment.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             fragment.getSupportActionBar().setDisplayShowHomeEnabled(false);
         }
+    }
+
+    public String formatTime(long millisec, boolean useMillisec){
+        long hours = TimeUnit.MILLISECONDS.toHours(millisec);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millisec) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millisec) % 60;
+        if(!useMillisec) {
+            if (hours == 0) {
+                return String.format("%02d:%02d", minutes, seconds);
+            } else {
+                return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            }
+        }else{
+            if (hours == 0) {
+                return String.format("%02d:%02d.%03d", minutes, seconds, millisec % 1000);
+            } else {
+                return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millisec % 1000);
+            }
+        }
+    }
+
+    public String formatDate(long time, String format){
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(time);
+        SimpleDateFormat formatStr = new SimpleDateFormat(format, Locale.getDefault());
+        return formatStr.format(date.getTime());
     }
 }

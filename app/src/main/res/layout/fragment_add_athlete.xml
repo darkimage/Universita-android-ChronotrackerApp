@@ -51,10 +51,10 @@
         android:layout_marginTop="15dp"
         android:hint="@string/athlete_sport">
 
-        <AutoCompleteTextView
+        <unipr.luc_af.components.InstantAutoComplete
             android:id="@+id/athlete_activity"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:editable="false"
             />
 

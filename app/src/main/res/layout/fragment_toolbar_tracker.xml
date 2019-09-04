@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar_tracker_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primaryLightColor"
+    android:clickable="true"
+    android:focusable="true"
+    android:elevation="4dp"
+    android:orientation="horizontal"
+    android:paddingEnd="10dp"
+    android:paddingStart="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="1dp"
+    tools:context=".ToolBarTracker">
+
+    <ImageButton
+        android:id="@+id/toolbar_tracker_start_pause"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_centerVertical="true"
+        android:background="@color/transparent"
+        android:contentDescription="@string/start"
+        android:scaleType="fitCenter"
+        android:src="@drawable/pause_to_start_anim"
+        android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/toolbar_tracker_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar_tracker_start_pause"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_tracker_lap_btn"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toEndOf="@+id/toolbar_tracker_start_pause"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_tracker_athlete_name"
+        tools:text="20:00" />
+
+    <TextView
+        android:id="@+id/toolbar_tracker_lap_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_tracker_lap_btn"
+        app:layout_constraintHorizontal_bias="0.39"
+        app:layout_constraintStart_toEndOf="@+id/toolbar_tracker_time"
+        app:layout_constraintTop_toTopOf="@+id/toolbar_tracker_time"
+        tools:text="20:00" />
+
+    <TextView
+        android:id="@+id/toolbar_tracker_athlete_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:textColor="@color/primaryTextColor"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_tracker_lap_btn"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toEndOf="@+id/toolbar_tracker_start_pause"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Un nome molto lungo" />
+
+    <android.widget.Button
+        android:id="@+id/toolbar_tracker_lap_btn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/lap"
+        app:elevation="0dp"
+        android:textColor="@color/primaryTextColor"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_tracker_stop"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="5dp"
+        tools:text="lap" />
+
+    <android.widget.Button
+        android:id="@+id/toolbar_tracker_stop"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_alignParentEnd="true"
+        android:text="@string/stop"
+        android:textColor="@color/secondaryColor"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="stop" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

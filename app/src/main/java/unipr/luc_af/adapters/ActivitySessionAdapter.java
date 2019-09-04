@@ -20,10 +20,14 @@ import unipr.luc_af.holders.ListViewHolder;
 public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
     private ActivitySession[] mActivitySessions = new ActivitySession[0];
-    private ActivitiesListItemClick mItemClick;
+    private ActivitiesListItemClick mItemClick = (a,b) -> {};
 
 
     public ActivitySessionAdapter() { }
+
+    public ActivitySessionAdapter(ActivitiesListItemClick onClick) {
+        mItemClick = onClick;
+    }
 
     public ActivitySessionAdapter(ActivitySession[] activitySessions, ActivitiesListItemClick onClick) {
         mActivitySessions = activitySessions;
@@ -32,12 +36,6 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
 
     public interface ActivitiesListItemClick{
         void onClick(View view, ActivitySession activitySession);
-    }
-
-    public void onActivityClick(View view, ActivitySession activitySession){
-        if(mItemClick != null){
-            mItemClick.onClick(view, activitySession);
-        }
     }
 
     public void setActivitySessions(ActivitySession[] activitySessions){
@@ -50,7 +48,6 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View activitiesView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycleview_activity_item,parent,false);
-
         return new ListViewHolder(activitiesView);
     }
 
@@ -58,7 +55,7 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         ActivitySession currentSession = mActivitySessions[position];
         TextView activityName = holder.itemView.findViewById(R.id.activities_list_activity_name);
-
+        holder.itemView.setOnClickListener((v) -> mItemClick.onClick(v,mActivitySessions[position]));
         DatabaseResult activityNameResult = (cursor) -> {
             cursor.moveToNext();
             activityName.setText(cursor.getString(1));

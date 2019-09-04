@@ -73,6 +73,7 @@ public class ChronoView extends LinearLayout {
     private float mRadius;
     private PorterDuffXfermode mClearPorter;
     private boolean setFirstState = false;
+    private OnServiceConnectedListener mServiceConnectedListener;
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -82,6 +83,7 @@ public class ChronoView extends LinearLayout {
             mChronoService.setOnTickListener((duration, lap) -> {
                 updateView(duration,lap);
             });
+            mServiceConnectedListener.onConnection(mChronoService);
         }
 
         @Override
@@ -112,6 +114,10 @@ public class ChronoView extends LinearLayout {
 
     public void unbindFromService(){
         mContext.unbindService(mConnection);
+    }
+
+    public void stopChronoService(){
+        mContext.stopService(new Intent(mContext, ChronoService.class));
     }
 
     public void bindToService(){
@@ -234,22 +240,10 @@ public class ChronoView extends LinearLayout {
     public void Stop(){
         if (mChronoService != null) {
             // Detach the service connection.
-            unbindFromService();
+//            unbindFromService();
             mContext.stopService(new Intent(mContext,ChronoService.class));
             Pause();
         }
-    }
-
-    public void setOnStateChangeListener(StateChangeListener onStateChange){
-        mStateChangeListener = onStateChange;
-    }
-
-    public void setOnTickListener(OnTickListener onTickListener){
-        mOnTickListener = onTickListener;
-    }
-
-    public void setOnLapListener(OnLapListener onLapListener){
-        mOnLapListener = onLapListener;
     }
 
     protected void resetView(){
@@ -337,15 +331,15 @@ public class ChronoView extends LinearLayout {
                 R.styleable.ChronoView_spinner_width,
                 50.0f);
 
-        mChronoText = view.findViewById(R.id.chronoview_main_text);
+        mChronoText = view.findViewById(R.id.chrono_view_main_text);
         mChronoText.setTextSize(textSize);
-        mChronoMillText = view.findViewById(R.id.chronoview_milliseconds_text);
+        mChronoMillText = view.findViewById(R.id.chrono_view_milliseconds_text);
         mChronoMillText.setTextSize(millisecondsSize);
         mChronoMillText.setTextColor(millisecondsColor);
 
-        mChronoLapText = view.findViewById(R.id.chronoview_lap_text);
+        mChronoLapText = view.findViewById(R.id.chrono_view_lap_text);
         mChronoLapText.setTextSize(textLapSize);
-        mChronoLapMillText = view.findViewById(R.id.chronoview_lap_milliseconds_text);
+        mChronoLapMillText = view.findViewById(R.id.chrono_view_lap_milliseconds_text);
         mChronoLapMillText.setTextSize(millisecondsLapSize);
         mChronoLapMillText.setTextColor(millisecondsColor);
 
@@ -370,6 +364,22 @@ public class ChronoView extends LinearLayout {
         mOffset = mSpinnerWidth / 2.0f;
     }
 
+    public void setOnServiceConnectedListener(OnServiceConnectedListener onServiceConnectedListener){
+        mServiceConnectedListener = onServiceConnectedListener;
+    }
+
+    public void setOnStateChangeListener(StateChangeListener onStateChange){
+        mStateChangeListener = onStateChange;
+    }
+
+    public void setOnTickListener(OnTickListener onTickListener){
+        mOnTickListener = onTickListener;
+    }
+
+    public void setOnLapListener(OnLapListener onLapListener){
+        mOnLapListener = onLapListener;
+    }
+
     public interface StateChangeListener{
         void onStateChange(ChronoData.State state, ChronoView view);
     }
@@ -380,6 +390,10 @@ public class ChronoView extends LinearLayout {
 
     public interface OnLapListener{
         void onLap(long duration, long currentDuration);
+    }
+
+    public interface OnServiceConnectedListener{
+        void onConnection(ChronoService service);
     }
 
     static public class ChronoService extends Service{
@@ -396,6 +410,13 @@ public class ChronoView extends LinearLayout {
         private TimerTask mTask;
         private long timeStep;
         private OnTickListener tickListener = (a,b)->{};
+        private OnTaskRemoved taskRemovedListener = ()->{};
+
+        public class ChronoBinder extends Binder {
+            public ChronoService getService(){
+                return ChronoService.this;
+            }
+        }
 
         @Override
         public void onCreate() {
@@ -419,6 +440,12 @@ public class ChronoView extends LinearLayout {
             return START_NOT_STICKY;
         }
 
+
+        @Override
+        public void onTaskRemoved(Intent rootIntent) {
+            super.onTaskRemoved(rootIntent);
+            taskRemovedListener.OnRemove();
+        }
 
         private Notification buildNotification(Intent intent){
             String textSmall = intent.getStringExtra(TEXT_SMALL_EXTRA);
@@ -457,12 +484,6 @@ public class ChronoView extends LinearLayout {
         @Override
         public IBinder onBind(Intent intent) {
             return mChronoBinder;
-        }
-
-        private class ChronoBinder extends Binder {
-            ChronoService getService(){
-                return ChronoService.this;
-            }
         }
 
         public ChronoData getData(){
@@ -529,10 +550,6 @@ public class ChronoView extends LinearLayout {
             return current;
         }
 
-        public void setOnTickListener(OnTickListener listener){
-            tickListener = listener;
-        }
-
         private TimerTask Task(){
             return new TimerTask() {
                 @Override
@@ -594,9 +611,21 @@ public class ChronoView extends LinearLayout {
             void runTask();
         }
 
+        public void setOnTickListener(OnTickListener listener){
+            tickListener = listener;
+        }
+        public void setOnTaskRemoved(OnTaskRemoved listener){
+            taskRemovedListener = listener;
+        }
+
         public interface OnTickListener{
             void onTick(long duration, long lap);
         }
+
+        public interface OnTaskRemoved{
+            void OnRemove();
+        }
+
     }
 
     static public class ChronoData implements Parcelable {

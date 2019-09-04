@@ -15,8 +15,6 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_height="match_parent">
         <TextView
             android:id="@+id/no_activities_message"
@@ -31,7 +29,6 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycle_list_activities"
             android:layout_width="match_parent"
-
             android:layout_height="match_parent"
             android:visibility="visible">
 

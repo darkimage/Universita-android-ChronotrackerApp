@@ -2,12 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout"
+    android:id="@+id/chrono_tracker_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/tracker_lap"
+    <android.widget.ImageButton
+        android:id="@+id/toolbar_tracker_lap_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_stopwatch_solid"
@@ -19,7 +19,27 @@
         app:layout_constraintStart_toEndOf="@+id/chronoview_start_stop_fab"
         app:layout_constraintTop_toTopOf="@+id/chronoview_start_stop_fab" />
 
-    <ImageButton
+    <android.widget.Button
+        android:id="@+id/tracker_unit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="@+id/tracker_chronometer"
+        tools:text="KM"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tracker_unit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primaryDisabledColor"
+        app:layout_constraintEnd_toEndOf="@+id/tracker_unit_button"
+        app:layout_constraintStart_toStartOf="@+id/tracker_unit_button"
+        app:layout_constraintTop_toTopOf="@+id/guideline_chronoview_percent"
+        tools:text="Kilometers" />
+
+    <android.widget.ImageButton
         android:id="@+id/tracker_reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,7 +78,7 @@
         android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/layout"
+        app:layout_constraintStart_toEndOf="@id/chrono_tracker_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/start_to_pause_anim" />
 
@@ -67,7 +87,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@id/guideline_chronoview_percent"
-        app:layout_constraintTop_toTopOf="@id/layout"
+        app:layout_constraintTop_toTopOf="@id/chrono_tracker_layout"
         app:milliseconds_color="@color/primaryDisabledColor"
         app:spinner_background="@color/primaryDisabledColorLight"
         app:spinner_color="@color/primaryLightColor"

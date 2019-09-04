@@ -1,6 +1,7 @@
 package unipr.luc_af.chronotracker.helpers;
 
 import android.content.Context;
+import android.os.Environment;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,5 +25,13 @@ public class FileIO {
             res += line;
         }
         return res;
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }

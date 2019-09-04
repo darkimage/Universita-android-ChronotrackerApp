@@ -125,7 +125,7 @@ public class StartTrackingDialog extends DialogFragment {
                 .setPositiveButton("Start",
                 (dialog, whichButton) -> {
                     StartSessionData data = new StartSessionData(mCurrentAthlete,mSelectedActivity,mSelectedActivityType);
-                    mActivitySessionModel.setSessionStartData(data);
+//                    mActivitySessionModel.setSessionStartData(data);
                     mActivitySessionModel.setStartSession(data);
                     this.dismiss();
                 })
