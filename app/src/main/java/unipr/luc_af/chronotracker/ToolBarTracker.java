@@ -1,12 +1,19 @@
 package unipr.luc_af.chronotracker;
 
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.SQLException;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -14,29 +21,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.os.IBinder;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import unipr.luc_af.chronotracker.helpers.Database;
 import unipr.luc_af.chronotracker.helpers.Utils;
 import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.Lap;
-import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.components.ChronoView;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.ActivitySessionModel;
 
+import static unipr.luc_af.chronotracker.MainActivity.ATHLETE_ACTIVITIES_LIST_TAG;
 import static unipr.luc_af.chronotracker.MainActivity.TOOLBAR_TRACKER_TAG;
 import static unipr.luc_af.chronotracker.MainActivity.TRACKER_TAG;
 
@@ -59,6 +56,7 @@ public class ToolBarTracker extends Fragment {
     private Button mLapButton;
     private ImageButton mStartStopButton;
     private ConstraintLayout mLayout;
+    private Button mFinishButton;
 
     public ToolBarTracker() {
         // Required empty public constructor
@@ -72,7 +70,7 @@ public class ToolBarTracker extends Fragment {
 
         setUpModels(savedInstanceState);
         setUpView(view);
-        updateView(0,0);
+        updateView(0, 0);
         return view;
     }
 
@@ -93,7 +91,7 @@ public class ToolBarTracker extends Fragment {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mChronoService = ((ChronoView.ChronoService.ChronoBinder) iBinder).getService();
             mChronoService.setOnTickListener((duration, lap) -> {
-                updateView(duration,lap);
+                updateView(duration, lap);
             });
             mChronoData = mChronoService.getData();
             setActionStatus(mChronoData.state);
@@ -105,66 +103,67 @@ public class ToolBarTracker extends Fragment {
         }
     };
 
-    private void bindToChronoService(){
+    private void bindToChronoService() {
         getActivity().bindService(new Intent(getActivity(), ChronoView.ChronoService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
-    private void unbindFromChronoService(){
+    private void unbindFromChronoService() {
         getActivity().unbindService(mConnection);
     }
 
-    private void updateView(long duration, long lap){
-        mDurationText.setText(utils.formatTime(duration,true));
-        mLapText.setText(utils.formatTime(lap,true));
+    private void updateView(long duration, long lap) {
+        mDurationText.setText(utils.formatTime(duration, true));
+        mLapText.setText(utils.formatTime(lap, true));
     }
 
-    private void setUpModels(Bundle savedInstanceState){
+    private void setUpModels(Bundle savedInstanceState) {
         mActivitySessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
         mActivitySessionModel.getToolBarSession().observe(getActivity(), (session) -> {
-            if(session != null) {
+            if (session != null) {
                 mActivitySession = session;
+                mActivitySessionModel.setToolbarSession(null);
             }
         });
 
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             mActivitySession = savedInstanceState.getParcelable(SESSION_BUNDLE);
             mActivitySessionModel.setActivitySession(mActivitySession);
         }
 
     }
 
-    private void setActionStatus(ChronoView.ChronoData.State state){
-        if(state == ChronoView.ChronoData.State.PAUSE){
+    private void setActionStatus(ChronoView.ChronoData.State state) {
+        if (state == ChronoView.ChronoData.State.PAUSE) {
             startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mLapButton.setEnabled(false);
         }
-        if(state == ChronoView.ChronoData.State.TRACK){
+        if (state == ChronoView.ChronoData.State.TRACK) {
             startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStartToStopAnim);
             mLapButton.setEnabled(true);
         }
-        if(state == ChronoView.ChronoData.State.RESET) {
+        if (state == ChronoView.ChronoData.State.RESET) {
             startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mLapButton.setEnabled(false);
         }
-        ((AnimatedVectorDrawable)mStartStopButton.getDrawable()).start();
+        ((AnimatedVectorDrawable) mStartStopButton.getDrawable()).start();
     }
 
-    private void Lap(){
-        mChronoService.LapTask(() ->{
-            Lap[] laps = Arrays.copyOf(mActivitySession.laps,mActivitySession.laps.length+1);
-            laps[laps.length-1] = new Lap(mChronoData.lastLapDuration, mChronoService.getCurrentTaskElapsed());
+    private void Lap() {
+        mChronoService.LapTask(() -> {
+            Lap[] laps = Arrays.copyOf(mActivitySession.laps, mActivitySession.laps.length + 1);
+            laps[laps.length - 1] = new Lap(mChronoData.lastLapDuration, mChronoService.getCurrentTaskElapsed());
             mActivitySession.laps = laps;
-            mLapText.setText(utils.formatTime(mChronoData.lastLapDuration,true));
+            mLapText.setText(utils.formatTime(mChronoData.lastLapDuration, true));
         });
     }
 
-    private void restoreChronometerFragment(){
+    private void restoreChronometerFragment() {
         mActivitySessionModel.setRestoreSession(mActivitySession);
-        ToolBarTracker fragment = (ToolBarTracker)getActivity().getSupportFragmentManager().findFragmentByTag(TOOLBAR_TRACKER_TAG);
-        if(fragment != null){
+        ToolBarTracker fragment = (ToolBarTracker) getActivity().getSupportFragmentManager().findFragmentByTag(TOOLBAR_TRACKER_TAG);
+        if (fragment != null) {
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .remove(fragment)
@@ -176,16 +175,16 @@ public class ToolBarTracker extends Fragment {
                             R.anim.horizontal_out_left,
                             R.anim.horizontal_in,
                             R.anim.horizontal_out)
-                    .replace(R.id.root, new ChronoTracker(),TRACKER_TAG)
+                    .replace(R.id.root, new ChronoTracker(), TRACKER_TAG)
                     .addToBackStack(TRACKER_TAG)
                     .commit();
             fragmentManager.executePendingTransactions();
         }
     }
 
-    private void setUpView(View view){
-        mStopToStartAnim = (AnimatedVectorDrawable)getActivity().getDrawable(R.drawable.pause_to_start_anim);
-        mStartToStopAnim = (AnimatedVectorDrawable)getActivity().getDrawable(R.drawable.start_to_pause_anim);
+    private void setUpView(View view) {
+        mStopToStartAnim = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.pause_to_start_anim);
+        mStartToStopAnim = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.start_to_pause_anim);
 
         mLayout = view.findViewById(R.id.toolbar_tracker_layout);
         mLayout.setOnClickListener((v) -> restoreChronometerFragment());
@@ -193,17 +192,17 @@ public class ToolBarTracker extends Fragment {
         mDurationText = view.findViewById(R.id.toolbar_tracker_time);
         mLapText = view.findViewById(R.id.toolbar_tracker_lap_text);
         mAthleteText = view.findViewById(R.id.toolbar_tracker_athlete_name);
-        DatabaseResult athleteNameResult = (cursor) ->{
+        DatabaseResult athleteNameResult = (cursor) -> {
             cursor.moveToNext();
             mAthleteText.setText(cursor.getString(1));
         };
-        Database.getInstance().getAthleteFromId(mActivitySession.athlete,athleteNameResult);
+        Database.getInstance().getAthleteFromId(mActivitySession.athlete, athleteNameResult);
 
         mStartStopButton = view.findViewById(R.id.toolbar_tracker_start_pause);
 
         ImageButton startStopButton = view.findViewById(R.id.toolbar_tracker_start_pause);
         startStopButton.setOnClickListener((v) -> {
-            if(startStopButtonState)
+            if (startStopButtonState)
                 mChronoService.ExecuteTask(() -> setActionStatus(mChronoData.state));
             else
                 mChronoService.PauseTask(() -> {
@@ -214,15 +213,56 @@ public class ToolBarTracker extends Fragment {
 
         mLapButton = view.findViewById(R.id.toolbar_tracker_lap_btn);
         mLapButton.setOnClickListener((btn) -> Lap());
+
+        mFinishButton = view.findViewById(R.id.toolbar_tracker_stop);
+        mFinishButton.setOnClickListener((v) -> StopSession());
     }
 
-    private void setSessionStopTime(){
+    private void StopSession() {
+
+        mChronoService.PauseTask(() -> {
+            View coordLayout = getActivity().findViewById(R.id.root_coordinator_layout);
+            mActivitySession.stopTime = mChronoData.lastPausedTime;
+            ChronoTracker.AddSession(mActivitySession, new ChronoTracker.AddSessionListener() {
+                @Override
+                public void OnSuccess(long id) {
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .setCustomAnimations(
+                                    R.anim.horizontal_in_left,
+                                    R.anim.horizontal_out_left,
+                                    R.anim.horizontal_in,
+                                    R.anim.horizontal_out)
+                            .replace(R.id.root, new AthleteActivities(), ATHLETE_ACTIVITIES_LIST_TAG)
+                            .addToBackStack(ATHLETE_ACTIVITIES_LIST_TAG)
+                            .commit();
+                    Snackbar.make(coordLayout, getActivity().getString(R.string.session_added), Snackbar.LENGTH_LONG).show();
+                    removeToolBarFragment();
+                }
+
+                @Override
+                public void OnError(SQLException err) {
+                    Snackbar.make(coordLayout, getActivity().getString(R.string.session_error), Snackbar.LENGTH_LONG).show();
+                    removeToolBarFragment();
+                }
+            });
+        });
+    }
+
+    private void removeToolBarFragment(){
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .remove(this)
+                .commit();
+    }
+
+    private void setSessionStopTime() {
         mActivitySession.stopTime = mChronoData.lastPausedTime;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(SESSION_BUNDLE,mActivitySession);
+        outState.putParcelable(SESSION_BUNDLE, mActivitySession);
     }
 }

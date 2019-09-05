@@ -7,14 +7,15 @@ public class Lap implements Parcelable {
     public Long duration;
     public Long fromStart;
 
-    public Lap(){ }
-
-    public Lap(Parcel parcel){
-        duration = (Long)parcel.readSerializable();
-        fromStart = (Long)parcel.readSerializable();
+    public Lap() {
     }
 
-    public Lap(long elapsed, long current){
+    public Lap(Parcel parcel) {
+        duration = (Long) parcel.readSerializable();
+        fromStart = (Long) parcel.readSerializable();
+    }
+
+    public Lap(long elapsed, long current) {
         duration = elapsed;
         fromStart = current;
     }

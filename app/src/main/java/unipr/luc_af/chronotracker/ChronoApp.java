@@ -17,8 +17,8 @@ public class ChronoApp extends Application {
         mContext = this;
     }
 
-    private void createNotificationChannels(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+    private void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                     "Chrono tracking service channel",
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -27,7 +27,7 @@ public class ChronoApp extends Application {
         }
     }
 
-    public static Context getContext(){
+    public static Context getContext() {
         return mContext;
     }
 }

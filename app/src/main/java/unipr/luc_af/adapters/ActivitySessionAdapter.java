@@ -20,10 +20,12 @@ import unipr.luc_af.holders.ListViewHolder;
 public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder> {
 
     private ActivitySession[] mActivitySessions = new ActivitySession[0];
-    private ActivitiesListItemClick mItemClick = (a,b) -> {};
+    private ActivitiesListItemClick mItemClick = (a, b) -> {
+    };
 
 
-    public ActivitySessionAdapter() { }
+    public ActivitySessionAdapter() {
+    }
 
     public ActivitySessionAdapter(ActivitiesListItemClick onClick) {
         mItemClick = onClick;
@@ -34,11 +36,11 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
         mItemClick = onClick;
     }
 
-    public interface ActivitiesListItemClick{
+    public interface ActivitiesListItemClick {
         void onClick(View view, ActivitySession activitySession);
     }
 
-    public void setActivitySessions(ActivitySession[] activitySessions){
+    public void setActivitySessions(ActivitySession[] activitySessions) {
         mActivitySessions = activitySessions;
         notifyDataSetChanged();
     }
@@ -47,7 +49,7 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
     @Override
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View activitiesView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycleview_activity_item,parent,false);
+                .inflate(R.layout.recycleview_activity_item, parent, false);
         return new ListViewHolder(activitiesView);
     }
 
@@ -55,41 +57,41 @@ public class ActivitySessionAdapter extends RecyclerView.Adapter<ListViewHolder>
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         ActivitySession currentSession = mActivitySessions[position];
         TextView activityName = holder.itemView.findViewById(R.id.activities_list_activity_name);
-        holder.itemView.setOnClickListener((v) -> mItemClick.onClick(v,mActivitySessions[position]));
+        holder.itemView.setOnClickListener((v) -> mItemClick.onClick(v, mActivitySessions[position]));
         DatabaseResult activityNameResult = (cursor) -> {
             cursor.moveToNext();
             activityName.setText(cursor.getString(1));
         };
-        Database.getInstance().getActivityFromId(currentSession.activity,activityNameResult);
+        Database.getInstance().getActivityFromId(currentSession.activity, activityNameResult);
         TextView duration = holder.itemView.findViewById(R.id.activities_list_elapsed_time);
-        duration.setText(formatTime(currentSession.stopTime - currentSession.startTime,true));
+        duration.setText(formatTime(currentSession.stopTime - currentSession.startTime, true));
         TextView lapsTextView = holder.itemView.findViewById(R.id.activities_list_laps);
 
         DatabaseResult lapsResult = cursor -> {
             cursor.moveToNext();
             Lap[] laps = new Lap[cursor.getCount()];
-            for (int j = 0; j < cursor.getCount() ; j++) {
-                laps[j] = new Lap(cursor.getLong(1),cursor.getLong(2));
+            for (int j = 0; j < cursor.getCount(); j++) {
+                laps[j] = new Lap(cursor.getLong(1), cursor.getLong(2));
                 cursor.moveToNext();
             }
             currentSession.laps = laps;
             lapsTextView.setText(String.valueOf(currentSession.laps.length));
         };
-        Database.getInstance().getLapsOfSession(currentSession,lapsResult);
+        Database.getInstance().getLapsOfSession(currentSession, lapsResult);
 
     }
 
-    static String formatTime(long millisec, boolean useMillisec){
+    static String formatTime(long millisec, boolean useMillisec) {
         long hours = TimeUnit.MILLISECONDS.toHours(millisec);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millisec) % 60;
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millisec) % 60;
-        if(!useMillisec) {
+        if (!useMillisec) {
             if (hours == 0) {
                 return String.format("%02d:%02d", minutes, seconds);
             } else {
                 return String.format("%02d:%02d:%02d", hours, minutes, seconds);
             }
-        }else{
+        } else {
             if (hours == 0) {
                 return String.format("%02d:%02d.%03d", minutes, seconds, millisec % 1000);
             } else {

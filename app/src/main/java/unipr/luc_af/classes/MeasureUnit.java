@@ -5,7 +5,7 @@ public class MeasureUnit {
     public String name;
     public String shortName;
 
-    public MeasureUnit(Long idRef, String nameRef, String shortNameRef){
+    public MeasureUnit(Long idRef, String nameRef, String shortNameRef) {
         id = idRef;
         name = nameRef;
         shortName = shortNameRef;

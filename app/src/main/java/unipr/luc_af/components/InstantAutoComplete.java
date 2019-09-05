@@ -3,6 +3,7 @@ package unipr.luc_af.components;
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 
 public class InstantAutoComplete extends AppCompatAutoCompleteTextView {

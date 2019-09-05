@@ -108,7 +108,7 @@ public class AthleteActivities extends Fragment {
         });
         if(savedInstanceState != null){
             mCurrentSelectedDay = (Calendar)savedInstanceState.getSerializable(CURRENT_DAY_TAG);
-            mCalendarView.setDate(mCurrentSelectedDay.getTimeInMillis());
+            mCalendarView.setDate(mCurrentSelectedDay.getTimeInMillis(),true,true);
             mSelectedAthlete = savedInstanceState.getParcelable(CURRENT_ATHLETE_TAG);
             getActivitiesOfDay(mCurrentSelectedDay.get(Calendar.YEAR),mCurrentSelectedDay.get(Calendar.MONTH),mCurrentSelectedDay.get(Calendar.DAY_OF_MONTH));
         }

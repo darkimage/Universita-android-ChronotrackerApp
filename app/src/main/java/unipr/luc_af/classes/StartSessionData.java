@@ -8,7 +8,7 @@ public class StartSessionData {
     public ActivitySportSpecialization activitySportType;
     public ChronoView.ChronoData trackingData;
 
-    public StartSessionData(Athlete athleteRef,ActivitySport activitySportRef, ActivitySportSpecialization activitySportTypeRef){
+    public StartSessionData(Athlete athleteRef, ActivitySport activitySportRef, ActivitySportSpecialization activitySportTypeRef) {
         athlete = athleteRef;
         activitySport = activitySportRef;
         activitySportType = activitySportTypeRef;
@@ -17,16 +17,16 @@ public class StartSessionData {
     public StartSessionData(Athlete athleteRef,
                             ActivitySport activitySportRef,
                             ActivitySportSpecialization activitySportTypeRef,
-                            ChronoView.ChronoData trackingDataRef){
+                            ChronoView.ChronoData trackingDataRef) {
         athlete = athleteRef;
         activitySport = activitySportRef;
         activitySportType = activitySportTypeRef;
         trackingData = trackingDataRef;
     }
 
-    public boolean isDataOk(){
-        if( athlete == null ||
-            activitySport == null){
+    public boolean isDataOk() {
+        if (athlete == null ||
+                activitySport == null) {
             return false;
         }
         return true;

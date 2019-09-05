@@ -7,13 +7,6 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +20,17 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 import unipr.luc_af.classes.ActivityGeneral;
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.ActivitySportSpecialization;
@@ -35,8 +39,6 @@ import unipr.luc_af.classes.StartSessionData;
 import unipr.luc_af.database.interfaces.DatabaseResult;
 import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
-import unipr.luc_af.chronotracker.helpers.Database;
-import unipr.luc_af.chronotracker.helpers.Utils;
 
 public class StartTrackingDialog extends DialogFragment {
     private String SAVED_ACTIVITY_ID = "activity_id";
@@ -66,7 +68,7 @@ public class StartTrackingDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             mActivityTypeSelectedId = savedInstanceState.getInt(SAVED_ACTIVITY_TYPE_ID);
             mActivitySelectedId = savedInstanceState.getInt(SAVED_ACTIVITY_TYPE_ID);
         }
@@ -77,8 +79,8 @@ public class StartTrackingDialog extends DialogFragment {
         mActivitySessionModel = new ViewModelProvider(getActivity()).get(ActivitySessionModel.class);
         final Observer<ActivitySport> selectedActivity = (activitySport) -> setActivityTypes(activitySport);
         final Observer<ActivitySportSpecialization> selectedActivityType = (activityType) -> getSelectedActivityType(activityType);
-        mActivitySessionModel.getDialogSelectedActivity().observe(getActivity(),selectedActivity);
-        mActivitySessionModel.getDialogSelectedActivityType().observe(getActivity(),selectedActivityType);
+        mActivitySessionModel.getDialogSelectedActivity().observe(getActivity(), selectedActivity);
+        mActivitySessionModel.getDialogSelectedActivityType().observe(getActivity(), selectedActivityType);
 
         mContext = getContext();
         Utils.getInstance().setToolBarNavigation((AppCompatActivity) getActivity());
@@ -102,7 +104,7 @@ public class StartTrackingDialog extends DialogFragment {
         });
 
         mExpandFromTopAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_from_top);
-        mCollapseFromTopAnim =  AnimationUtils.loadAnimation(getActivity(), R.anim.collapse_from_top);
+        mCollapseFromTopAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.collapse_from_top);
 
         DatabaseResult activityArray = (cursor) -> {
             ActivitySport[] activities = getActivities(cursor);
@@ -118,33 +120,33 @@ public class StartTrackingDialog extends DialogFragment {
 
         mAthleteModel = new ViewModelProvider(getActivity()).get(AthleteModel.class);
         final Observer<Athlete> athleteObserver = (athlete) -> mCurrentAthlete = athlete;
-        mAthleteModel.getSelectedAthlete().observe(getActivity(),athleteObserver);
+        mAthleteModel.getSelectedAthlete().observe(getActivity(), athleteObserver);
 
         builder.setView(view)
                 .setTitle(R.string.start_tracking_header)
                 .setPositiveButton("Start",
-                (dialog, whichButton) -> {
-                    StartSessionData data = new StartSessionData(mCurrentAthlete,mSelectedActivity,mSelectedActivityType);
+                        (dialog, whichButton) -> {
+                            StartSessionData data = new StartSessionData(mCurrentAthlete, mSelectedActivity, mSelectedActivityType);
 //                    mActivitySessionModel.setSessionStartData(data);
-                    mActivitySessionModel.setStartSession(data);
-                    this.dismiss();
-                })
+                            mActivitySessionModel.setStartSession(data);
+                            this.dismiss();
+                        })
                 .setNegativeButton("Cancel",
-                    (dialog, whichButton) -> {
-                        dialog.dismiss();
-                    });
+                        (dialog, whichButton) -> {
+                            dialog.dismiss();
+                        });
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener((dialogInterface) ->{
-            final Observer<Void> updateButton = (v) ->{
+        dialog.setOnShowListener((dialogInterface) -> {
+            final Observer<Void> updateButton = (v) -> {
                 setActionButtonState(dialogInterface);
             };
-            updatePositiveButton.observe(getActivity(),updateButton);
+            updatePositiveButton.observe(getActivity(), updateButton);
         });
         updatePositiveButton.setValue(null);
         return dialog;
     }
 
-    private <E extends ActivityGeneral> void populateRadioGroup(RadioGroup group, E[] data){
+    private <E extends ActivityGeneral> void populateRadioGroup(RadioGroup group, E[] data) {
         for (int i = 0; i < data.length; i++) {
             RadioButton activityButton = new RadioButton(mContext);
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
@@ -158,7 +160,7 @@ public class StartTrackingDialog extends DialogFragment {
         }
     }
 
-    private ActivitySport[] getActivities(Cursor cursor){
+    private ActivitySport[] getActivities(Cursor cursor) {
         ActivitySport[] activities = new ActivitySport[cursor.getCount()];
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -168,13 +170,13 @@ public class StartTrackingDialog extends DialogFragment {
         return activities;
     }
 
-    private void getSelectedActivityType(ActivitySportSpecialization activityType){
+    private void getSelectedActivityType(ActivitySportSpecialization activityType) {
         mSelectedActivityType = activityType;
         updatePositiveButton.setValue(null);
     }
 
 
-    private void setActivityTypes(ActivitySport selectedActivity){
+    private void setActivityTypes(ActivitySport selectedActivity) {
         mSelectedActivity = selectedActivity;
         mSelectedActivityHasTypes = false;
         mActivitySessionModel.setDialogSelectedActivityType(null);
@@ -188,16 +190,16 @@ public class StartTrackingDialog extends DialogFragment {
                         cursor.getLong(2));
                 cursor.moveToNext();
             }
-            if(activitySportTypes.length != 0) {
+            if (activitySportTypes.length != 0) {
                 if (!previousHasEntries) {
                     showActivityTypesRadioButtons(activitySportTypes);
-                }else{
-                    mActivityTypeGroup.postDelayed(() ->{
+                } else {
+                    mActivityTypeGroup.postDelayed(() -> {
                         showActivityTypesRadioButtons(activitySportTypes);
                     }, mCollapseFromTopAnim.getDuration());
                 }
                 previousHasEntries = true;
-            }else{
+            } else {
                 previousHasEntries = false;
                 mSelectedActivityHasTypes = false;
                 mActivityTypeSelectedId = -1;
@@ -209,10 +211,10 @@ public class StartTrackingDialog extends DialogFragment {
             }
             updatePositiveButton.setValue(null);
         };
-        Database.getInstance().getActivitiesTypesOfActivity(selectedActivity,activityTypes);
+        Database.getInstance().getActivitiesTypesOfActivity(selectedActivity, activityTypes);
     }
 
-    private void showActivityTypesRadioButtons(ActivitySportSpecialization[] activitySportTypes){
+    private void showActivityTypesRadioButtons(ActivitySportSpecialization[] activitySportTypes) {
         mActivityTypeGroup.removeAllViews();
         mSelectedActivityHasTypes = true;
         mActivityTypeGroup.setVisibility(View.VISIBLE);
@@ -220,23 +222,23 @@ public class StartTrackingDialog extends DialogFragment {
         mActivityTypeGroup.startAnimation(mExpandFromTopAnim);
         populateRadioGroup(mActivityTypeGroup, activitySportTypes);
         RadioButton activityRadio = mActivityTypeGroup.findViewById(mActivityTypeSelectedId);
-        if(activityRadio != null) {
+        if (activityRadio != null) {
             activityRadio.toggle();
         }
     }
 
-    private void setActionButtonState(DialogInterface dialogInterface){
+    private void setActionButtonState(DialogInterface dialogInterface) {
         Button posButton = ((AlertDialog) dialogInterface).getButton(DialogInterface.BUTTON_POSITIVE);
-        if(mSelectedActivity != null && !mSelectedActivityHasTypes){
+        if (mSelectedActivity != null && !mSelectedActivityHasTypes) {
             posButton.setEnabled(true);
-        }else if(mSelectedActivity != null && mSelectedActivityType != null){
+        } else if (mSelectedActivity != null && mSelectedActivityType != null) {
             posButton.setEnabled(true);
-        }else {
+        } else {
             posButton.setEnabled(false);
         }
     }
 
-    private void userCancel(){
+    private void userCancel() {
         mActivitySessionModel.setDialogSelectedActivity(null);
         mActivitySessionModel.setDialogSelectedActivityType(null);
     }
@@ -248,8 +250,8 @@ public class StartTrackingDialog extends DialogFragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt(SAVED_ACTIVITY_ID,mActivityGroup.getCheckedRadioButtonId());
-        if(mSelectedActivityHasTypes) {
+        outState.putInt(SAVED_ACTIVITY_ID, mActivityGroup.getCheckedRadioButtonId());
+        if (mSelectedActivityHasTypes) {
             outState.putInt(SAVED_ACTIVITY_TYPE_ID, mActivityTypeGroup.getCheckedRadioButtonId());
         }
         super.onSaveInstanceState(outState);

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel;
 import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.ActivitySport;
 import unipr.luc_af.classes.ActivitySportSpecialization;
-import unipr.luc_af.classes.Lap;
 import unipr.luc_af.classes.StartSessionData;
 
 public class ActivitySessionModel extends ViewModel {
@@ -20,50 +19,69 @@ public class ActivitySessionModel extends ViewModel {
     private final MutableLiveData<ActivitySession> endSession = new MutableLiveData<>();
     private final MutableLiveData<ActivitySession> selectedActivitySession = new MutableLiveData<>();
 
-    public ActivitySessionModel(){}
+    public ActivitySessionModel() {
+    }
 
     public LiveData<StartSessionData> getStartSession() {
         return startSession;
     }
+
     public LiveData<ActivitySession> getRestoreSession() {
         return restoreSession;
     }
+
     public LiveData<ActivitySession> getSelectedActivitySession() {
         return selectedActivitySession;
     }
+
     public LiveData<ActivitySession> getToolBarSession() {
         return toolbarSession;
     }
+
     public LiveData<ActivitySession> getActivitySession() {
         return activitySession;
     }
+
     public LiveData<ActivitySport> getDialogSelectedActivity() {
         return dialogSelectedActivity;
     }
-    public LiveData<ActivitySportSpecialization> getDialogSelectedActivityType() { return dialogSelectedActivityType; }
-    public LiveData<ActivitySession> getEndSession() { return endSession; }
 
-    public void setDialogSelectedActivity(ActivitySport activitySport){
+    public LiveData<ActivitySportSpecialization> getDialogSelectedActivityType() {
+        return dialogSelectedActivityType;
+    }
+
+    public LiveData<ActivitySession> getEndSession() {
+        return endSession;
+    }
+
+    public void setDialogSelectedActivity(ActivitySport activitySport) {
         dialogSelectedActivity.setValue(activitySport);
     }
-    public void setDialogSelectedActivityType(ActivitySportSpecialization activitySportType){
+
+    public void setDialogSelectedActivityType(ActivitySportSpecialization activitySportType) {
         dialogSelectedActivityType.setValue(activitySportType);
     }
-    public void setActivitySession(ActivitySession activitySessionData){
+
+    public void setActivitySession(ActivitySession activitySessionData) {
         activitySession.setValue(activitySessionData);
     }
-    public void setStartSession(StartSessionData activitySessionData){
+
+    public void setStartSession(StartSessionData activitySessionData) {
         startSession.setValue(activitySessionData);
     }
-    public void setEndSession(ActivitySession endData){
+
+    public void setEndSession(ActivitySession endData) {
         endSession.setValue(endData);
     }
-    public void setSelectedActivitySession(ActivitySession activitySessionData){
+
+    public void setSelectedActivitySession(ActivitySession activitySessionData) {
         selectedActivitySession.setValue(activitySessionData);
     }
+
     public void setToolbarSession(ActivitySession session) {
         toolbarSession.setValue(session);
     }
+
     public void setRestoreSession(ActivitySession session) {
         restoreSession.setValue(session);
     }

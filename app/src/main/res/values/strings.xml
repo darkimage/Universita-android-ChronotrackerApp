@@ -48,4 +48,6 @@
     <string name="laps">Laps</string>
     <string name="sport">Sport</string>
     <string name="session_duration">Total Duration</string>
+    <string name="session_added">Session added</string>
+    <string name="session_error">Error adding session</string>
 </resources>

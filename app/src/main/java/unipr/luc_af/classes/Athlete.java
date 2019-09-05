@@ -16,7 +16,7 @@ public class Athlete implements Parcelable {
         activityReference = activity;
     }
 
-    public Athlete(Parcel parcel){
+    public Athlete(Parcel parcel) {
         id = (Long) parcel.readSerializable();
         name = (String) parcel.readSerializable();
         surname = (String) parcel.readSerializable();

@@ -14,23 +14,26 @@ public class ActivitySession implements Parcelable {
     public Integer speed;
     public Lap[] laps;
 
-    public ActivitySession() {};
+    public ActivitySession() {
+    }
 
-    public ActivitySession(Parcel parcel){
-        athlete = (Long)parcel.readSerializable();
-        activity = (Long)parcel.readSerializable();
-        activityType = (Long)parcel.readSerializable();
-        startTime = (Long)parcel.readSerializable();
-        stopTime = (Long)parcel.readSerializable();
-        distance = (Long)parcel.readSerializable();
+    ;
+
+    public ActivitySession(Parcel parcel) {
+        athlete = (Long) parcel.readSerializable();
+        activity = (Long) parcel.readSerializable();
+        activityType = (Long) parcel.readSerializable();
+        startTime = (Long) parcel.readSerializable();
+        stopTime = (Long) parcel.readSerializable();
+        distance = (Long) parcel.readSerializable();
         speed = (Integer) parcel.readSerializable();
         laps = (Lap[]) parcel.readArray(Lap.class.getClassLoader());
     }
 
     public ActivitySession(Long athleteReference,
-                    Long activityReference,
-                    Long activityTypeReference,
-                    Long distanceReference){
+                           Long activityReference,
+                           Long activityTypeReference,
+                           Long distanceReference) {
         athlete = athleteReference;
         activity = activityReference;
         activity = activityTypeReference;
@@ -38,14 +41,14 @@ public class ActivitySession implements Parcelable {
     }
 
     public ActivitySession(Long activityId,
-                    Long athleteRef,
-                    Long activityRef,
-                    Long activityTypeRef,
-                    Long startTimeRef,
-                    Long stopTimeRef,
-                    Long distanceRef,
-                    Integer speedRef,
-                    Lap[] lapsRef){
+                           Long athleteRef,
+                           Long activityRef,
+                           Long activityTypeRef,
+                           Long startTimeRef,
+                           Long stopTimeRef,
+                           Long distanceRef,
+                           Integer speedRef,
+                           Lap[] lapsRef) {
         id = activityId;
         athlete = athleteRef;
         activity = activityRef;
@@ -72,7 +75,7 @@ public class ActivitySession implements Parcelable {
         parcel.writeSerializable(stopTime);
         parcel.writeSerializable(distance);
         parcel.writeSerializable(speed);
-        parcel.writeTypedArray(laps,i);
+        parcel.writeTypedArray(laps, i);
     }
 
     public static Creator<ActivitySession> CREATOR = new Creator<ActivitySession>() {

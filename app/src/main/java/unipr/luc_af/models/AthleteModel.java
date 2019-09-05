@@ -12,24 +12,30 @@ public class AthleteModel extends ViewModel {
     private final MutableLiveData<Athlete> athleteSelection = new MutableLiveData<>();
     private final MutableLiveData<ActivitySession[]> athleteCurrentDayActivities = new MutableLiveData<>();
 
-    public AthleteModel() {}
+    public AthleteModel() {
+    }
+
     public LiveData<Athlete> getAthlete() {
         return athleteData;
     }
+
     public LiveData<Athlete> getSelectedAthlete() {
         return athleteSelection;
     }
+
     public LiveData<ActivitySession[]> getAthleteCurrentDayActivities() {
         return athleteCurrentDayActivities;
     }
 
-    public void addAthlete(Athlete athlete){
+    public void addAthlete(Athlete athlete) {
         athleteData.setValue(athlete);
     }
+
     public void selectAthlete(Athlete athlete) {
         athleteSelection.setValue(athlete);
     }
-    public void setCurrentDayActivities (ActivitySession[] activities) {
+
+    public void setCurrentDayActivities(ActivitySession[] activities) {
         athleteCurrentDayActivities.setValue(activities);
     }
 }

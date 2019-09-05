@@ -1,8 +1,8 @@
 package unipr.luc_af.database;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.content.Context;
 
 import unipr.luc_af.chronotracker.helpers.FileIO;
 
@@ -20,18 +20,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //Apriamo il file che contiene la query sql di creazione del database ed eseguiamo tutti gli statements che contiene
-        try{
+        try {
             String sqlCreationQuery = FileIO.getInstance().ReadFileFromAssets("db.sql", appContext);
             String[] statements = sqlCreationQuery.split(";");
-            for (String statement: statements) {
+            for (String statement : statements) {
                 sqLiteDatabase.execSQL(statement);
             }
             String sqlInitQuery = FileIO.getInstance().ReadFileFromAssets("init.sql", appContext);
             statements = sqlInitQuery.split(";");
-            for (String statement: statements) {
+            for (String statement : statements) {
                 sqLiteDatabase.execSQL(statement);
             }
-        }catch (Exception  err){
+        } catch (Exception err) {
             System.out.println(err.getLocalizedMessage());
         }
     }

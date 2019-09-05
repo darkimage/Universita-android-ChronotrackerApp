@@ -1,17 +1,20 @@
 package unipr.luc_af.chronotracker;
 
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import com.google.android.material.snackbar.Snackbar;
 
+import unipr.luc_af.chronotracker.helpers.Database;
+import unipr.luc_af.chronotracker.helpers.Utils;
 import unipr.luc_af.classes.ActivitySession;
 import unipr.luc_af.classes.Athlete;
 import unipr.luc_af.classes.StartSessionData;
@@ -19,8 +22,6 @@ import unipr.luc_af.models.ActivitySessionModel;
 import unipr.luc_af.models.AthleteModel;
 import unipr.luc_af.models.PopupItemsModel;
 import unipr.luc_af.models.TitleBarModel;
-import unipr.luc_af.chronotracker.helpers.Database;
-import unipr.luc_af.chronotracker.helpers.Utils;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,19 +40,19 @@ public class MainActivity extends AppCompatActivity {
     private ActivitySession mCurrentSessionData = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
 
         Database.getInstance().setContext(this); //inizializziamo per questa activity il database service
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.root_toolbar);
         setSupportActionBar(myToolbar);
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             //Aggiungiamo il layout iniziale AthleteList se non stiamo ritornando da uno state change
             //in quel caso lo abbiamo gia sostituito con altri fragments
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.root, new AthleteList(),ATHLETE_LIST_TAG)
+                    .replace(R.id.root, new AthleteList(), ATHLETE_LIST_TAG)
                     .commit();
         }
         //Action bar update observer usando un viewmodel
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mActivitiesSessionModel = new ViewModelProvider(this).get(ActivitySessionModel.class);
         mPopupItemsModel = new ViewModelProvider(this).get(PopupItemsModel.class);
 
-        final Observer<int[]> popupItemsObserver = (items) ->{
+        final Observer<int[]> popupItemsObserver = (items) -> {
             mPopupActiveItems = items;
             invalidateOptionsMenu();
         };
@@ -68,15 +69,15 @@ public class MainActivity extends AppCompatActivity {
         final Observer<String> titleObserver = (title) -> getSupportActionBar().setTitle(title);
         final Observer<Athlete> athleteObserver = (athlete) -> addAthlete(athlete);
         final Observer<StartSessionData> startSessionDataObserver = (data) -> {
-            if(data != null) {
+            if (data != null) {
                 showTracker(data);
             }
         };
         final Observer<ActivitySession> activitySessionObserver = (data) ->
                 mCurrentSessionData = data;
 
-        mActivitiesSessionModel.getStartSession().observe(this,startSessionDataObserver);
-        mActivitiesSessionModel.getActivitySession().observe(this,activitySessionObserver);
+        mActivitiesSessionModel.getStartSession().observe(this, startSessionDataObserver);
+        mActivitiesSessionModel.getActivitySession().observe(this, activitySessionObserver);
         mAthleteModel.getAthlete().observe(this, athleteObserver);
         mTitleModel.getTitle().observe(this, titleObserver);
         mPopupItemsModel.getActiveItems().observe(this, popupItemsObserver);
@@ -117,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void showTracker(StartSessionData data){
-        if(data == null) return;
-        if(data.isDataOk()){
+    private void showTracker(StartSessionData data) {
+        if (data == null) return;
+        if (data.isDataOk()) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .setCustomAnimations(
@@ -127,21 +128,21 @@ public class MainActivity extends AppCompatActivity {
                             R.anim.horizontal_out_left,
                             R.anim.horizontal_in,
                             R.anim.horizontal_out)
-                    .replace(R.id.root, new ChronoTracker(),TRACKER_TAG)
+                    .replace(R.id.root, new ChronoTracker(), TRACKER_TAG)
                     .addToBackStack(TRACKER_TAG)
                     .commit();
             fragmentManager.executePendingTransactions();
         }
     }
 
-    private boolean onStartTrackingClicked(){
+    private boolean onStartTrackingClicked() {
         StartTrackingDialog dialog = new StartTrackingDialog();
-        dialog.show(getSupportFragmentManager(),"start_tracking_dialog");
+        dialog.show(getSupportFragmentManager(), "start_tracking_dialog");
         return true;
     }
 
-    private boolean onFinishTrackingClicked(){
-        if(mCurrentSessionData != null){
+    private boolean onFinishTrackingClicked() {
+        if (mCurrentSessionData != null) {
             mActivitiesSessionModel.setEndSession(mCurrentSessionData);
         }
         return true;
@@ -151,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         ChronoTracker tracker = (ChronoTracker) getSupportFragmentManager().findFragmentByTag(TRACKER_TAG);
-        if(tracker != null && tracker.isRemoving()){
-            if(mCurrentSessionData != null) {
+        if (tracker != null && tracker.isRemoving()) {
+            if (mCurrentSessionData != null) {
                 ToolBarTracker toolBarTracker = new ToolBarTracker();
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.toolbar_row, toolBarTracker, TOOLBAR_TRACKER_TAG)
@@ -161,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addAthlete(Athlete athlete){
+    private void addAthlete(Athlete athlete) {
         Database.getInstance().addAthlete(athlete, (id) -> {
-            if(id != -1){
+            if (id != -1) {
                 FragmentManager manager = getSupportFragmentManager();
                 manager.beginTransaction()
                         .setCustomAnimations(
@@ -171,12 +172,12 @@ public class MainActivity extends AppCompatActivity {
                                 R.anim.horizontal_out_left,
                                 R.anim.horizontal_in,
                                 R.anim.horizontal_out)
-                        .replace(R.id.root, new AthleteList(),ATHLETE_LIST_TAG)
+                        .replace(R.id.root, new AthleteList(), ATHLETE_LIST_TAG)
                         .addToBackStack(ATHLETE_LIST_TAG)
                         .commit();
                 manager.executePendingTransactions();
                 View contextView = findViewById(R.id.root_coordinator_layout);
-                Utils.getInstance().executeWithDelay(700,() ->
+                Utils.getInstance().executeWithDelay(700, () ->
                         Snackbar.make(contextView,
                                 getString(R.string.athlete) + " " + athlete.name + " " + athlete.surname + " " + getString(R.string.added),
                                 Snackbar.LENGTH_LONG)

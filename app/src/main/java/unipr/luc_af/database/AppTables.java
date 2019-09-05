@@ -28,10 +28,12 @@ public enum AppTables {
     LAP_TABLE_COL_2("of_session");
 
     private String name;
-    AppTables(String tableName){
+
+    AppTables(String tableName) {
         name = tableName;
     }
-    public String getName(){
+
+    public String getName() {
         return name;
     }
 }
