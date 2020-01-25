@@ -50,4 +50,5 @@
     <string name="session_duration">Total Duration</string>
     <string name="session_added">Session added</string>
     <string name="session_error">Error adding session</string>
+    <string name="file_saved_success">File saved successfully!</string>
 </resources>

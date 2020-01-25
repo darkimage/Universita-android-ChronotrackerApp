@@ -202,10 +202,11 @@ public class MainActivity extends AppCompatActivity {
             if(file.createNewFile()) {
                 //second argument of FileOutputStream constructor indicates whether to append or create new file if one exists
                 outputStream = new FileWriter(file, false);
-
                 outputStream.write(builder.toString());
                 outputStream.flush();
                 outputStream.close();
+                View contextView = findViewById(R.id.root_coordinator_layout);
+                Snackbar.make(contextView,getString(R.string.file_saved_success),Snackbar.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
