@@ -11,6 +11,7 @@ import unipr.luc_af.classes.StartSessionData;
 
 public class ActivitySessionModel extends ViewModel {
     private final MutableLiveData<ActivitySport> dialogSelectedActivity = new MutableLiveData<>();
+    private final MutableLiveData<ActivitySession[]> currentDayActivities = new MutableLiveData<>();
     private final MutableLiveData<ActivitySportSpecialization> dialogSelectedActivityType = new MutableLiveData<>();
     private final MutableLiveData<ActivitySession> activitySession = new MutableLiveData<>();
     private final MutableLiveData<ActivitySession> toolbarSession = new MutableLiveData<>();
@@ -50,8 +51,10 @@ public class ActivitySessionModel extends ViewModel {
         return dialogSelectedActivityType;
     }
 
-    public LiveData<ActivitySession> getEndSession() {
-        return endSession;
+    public LiveData<ActivitySession> getEndSession() { return endSession; }
+
+    public LiveData<ActivitySession[]> getCurrentDayActivities() {
+        return currentDayActivities;
     }
 
     public void setDialogSelectedActivity(ActivitySport activitySport) {
@@ -84,5 +87,9 @@ public class ActivitySessionModel extends ViewModel {
 
     public void setRestoreSession(ActivitySession session) {
         restoreSession.setValue(session);
+    }
+
+    public void setCurrentDayActivities(ActivitySession[] activitySessionData) {
+        currentDayActivities.setValue(activitySessionData);
     }
 }

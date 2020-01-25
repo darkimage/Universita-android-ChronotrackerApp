@@ -152,13 +152,15 @@ public class AthleteActivities extends Fragment {
                 mNoActivitiesMessage.setVisibility(View.GONE);
                 mActivitiesList.setVisibility(View.VISIBLE);
                 mActivitiesList.startAnimation(mFadeIn);
-                mActivitySessionAdapter.setActivitySessions(buildActivitySessions(cursor));
+                ActivitySession[] sessions = buildActivitySessions(cursor);
+                mActivitySessionAdapter.setActivitySessions(sessions);
+                mActivitySessionModel.setCurrentDayActivities(sessions);
             }
         };
         Database.getInstance().getActivitiesOfDay(date, mSelectedAthlete, activitiesOfDay);
     }
 
-    private ActivitySession[] buildActivitySessions(Cursor cursor){
+    public static ActivitySession[] buildActivitySessions(Cursor cursor){
         ActivitySession[] activitySessions = new ActivitySession[cursor.getCount()];
         for (int i = 0; i < cursor.getCount(); i++) {
             activitySessions[i] = new ActivitySession(

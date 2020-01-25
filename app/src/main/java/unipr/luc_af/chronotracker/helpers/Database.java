@@ -385,6 +385,30 @@ public class Database {
         task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    public void getAllActivitiesOfAthlete(Athlete athlete, DatabaseResult result) {
+        NoLeakAsyncTask<Void, Void, Cursor> task = new NoLeakAsyncTask<>(mContext,
+                (Void... in) -> {
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    Utils utils = Utils.getInstance();
+                    Cursor queryCursor = db.query(AppTables.SESSION_TABLE.getName(),
+                            new String[0],
+                            utils.concatString(" ",
+                                    AppTables.SESSION_TABLE_COL_0.getName(),
+                                    "=",
+                                    athlete.id.toString()
+                            ),
+                            null,
+                            null,
+                            null,
+                            null);
+                    return queryCursor;
+                },
+                (cursor) -> {
+                    result.OnResult(cursor);
+                });
+        task.executeOnExecutor(NoLeakAsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     public void getMeasureUnits(DatabaseResult result) {
         NoLeakAsyncTask<Void, Void, Cursor> task = new NoLeakAsyncTask<>(mContext,
                 (Void... in) -> {
