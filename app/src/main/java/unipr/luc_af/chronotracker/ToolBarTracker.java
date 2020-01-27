@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 
+import unipr.luc_af.chronotracker.helpers.ChronoService;
 import unipr.luc_af.chronotracker.helpers.Database;
 import unipr.luc_af.chronotracker.helpers.Utils;
 import unipr.luc_af.classes.ActivitySession;
@@ -40,11 +41,11 @@ import static unipr.luc_af.chronotracker.MainActivity.TRACKER_TAG;
 public class ToolBarTracker extends Fragment {
     private static final String SESSION_BUNDLE = "session_bundle";
     //LOGIC
-    private ChronoView.ChronoService mChronoService;
+    private ChronoService mChronoService;
     private ActivitySessionModel mActivitySessionModel;
     private ActivitySession mActivitySession;
     private Utils utils = Utils.getInstance();
-    private ChronoView.ChronoData mChronoData;
+    private ChronoService.ChronoData mChronoData;
 
     //UI
     private AnimatedVectorDrawable mStartToStopAnim;
@@ -89,7 +90,7 @@ public class ToolBarTracker extends Fragment {
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mChronoService = ((ChronoView.ChronoService.ChronoBinder) iBinder).getService();
+            mChronoService = ((ChronoService.ChronoBinder) iBinder).getService();
             mChronoService.setOnTickListener((duration, lap) -> {
                 updateView(duration, lap);
             });
@@ -104,7 +105,7 @@ public class ToolBarTracker extends Fragment {
     };
 
     private void bindToChronoService() {
-        getActivity().bindService(new Intent(getActivity(), ChronoView.ChronoService.class), mConnection, Context.BIND_AUTO_CREATE);
+        getActivity().bindService(new Intent(getActivity(), ChronoService.class), mConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void unbindFromChronoService() {
@@ -132,18 +133,18 @@ public class ToolBarTracker extends Fragment {
 
     }
 
-    private void setActionStatus(ChronoView.ChronoData.State state) {
-        if (state == ChronoView.ChronoData.State.PAUSE) {
+    private void setActionStatus(ChronoService.ChronoData.State state) {
+        if (state == ChronoService.ChronoData.State.PAUSE) {
             startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mLapButton.setEnabled(false);
         }
-        if (state == ChronoView.ChronoData.State.TRACK) {
+        if (state == ChronoService.ChronoData.State.TRACK) {
             startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStartToStopAnim);
             mLapButton.setEnabled(true);
         }
-        if (state == ChronoView.ChronoData.State.RESET) {
+        if (state == ChronoService.ChronoData.State.RESET) {
             startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mLapButton.setEnabled(false);

@@ -1,12 +1,12 @@
 package unipr.luc_af.classes;
 
-import unipr.luc_af.components.ChronoView;
+import unipr.luc_af.chronotracker.helpers.ChronoService;
 
 public class StartSessionData {
     public Athlete athlete;
     public ActivitySport activitySport;
     public ActivitySportSpecialization activitySportType;
-    public ChronoView.ChronoData trackingData;
+    public ChronoService.ChronoData trackingData;
 
     public StartSessionData(Athlete athleteRef, ActivitySport activitySportRef, ActivitySportSpecialization activitySportTypeRef) {
         athlete = athleteRef;
@@ -17,7 +17,7 @@ public class StartSessionData {
     public StartSessionData(Athlete athleteRef,
                             ActivitySport activitySportRef,
                             ActivitySportSpecialization activitySportTypeRef,
-                            ChronoView.ChronoData trackingDataRef) {
+                            ChronoService.ChronoData trackingDataRef) {
         athlete = athleteRef;
         activitySport = activitySportRef;
         activitySportType = activitySportTypeRef;

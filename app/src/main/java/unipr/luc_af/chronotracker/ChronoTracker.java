@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import unipr.luc_af.adapters.LapTimeAdapter;
+import unipr.luc_af.chronotracker.helpers.ChronoService;
 import unipr.luc_af.chronotracker.helpers.Database;
 import unipr.luc_af.chronotracker.helpers.Utils;
 import unipr.luc_af.classes.ActivitySession;
@@ -206,7 +207,7 @@ public class ChronoTracker extends Fragment {
         updateSession();
     }
 
-    private void setOnApplicationClosed(ChronoView.ChronoService service) {
+    private void setOnApplicationClosed(ChronoService service) {
         service.setOnTaskRemoved(() -> {
             mChronometer.Pause();
             mChronometer.stopChronoService();
@@ -320,22 +321,22 @@ public class ChronoTracker extends Fragment {
         }
     }
 
-    private void setActionStatus(ChronoView.ChronoData.State state) {
-        if (state == ChronoView.ChronoData.State.PAUSE) {
+    private void setActionStatus(ChronoService.ChronoData.State state) {
+        if (state == ChronoService.ChronoData.State.PAUSE) {
             startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mResetButton.setEnabled(true);
             mLapButton.setEnabled(false);
             updateSession();
         }
-        if (state == ChronoView.ChronoData.State.TRACK) {
+        if (state == ChronoService.ChronoData.State.TRACK) {
             startStopButtonState = true;
             mStartStopButton.setImageDrawable(mStartToStopAnim);
             mLapButton.setEnabled(true);
             mResetButton.setEnabled(false);
             updateSession();
         }
-        if (state == ChronoView.ChronoData.State.RESET) {
+        if (state == ChronoService.ChronoData.State.RESET) {
             startStopButtonState = false;
             mStartStopButton.setImageDrawable(mStopToStartAnim);
             mLapButton.setEnabled(false);

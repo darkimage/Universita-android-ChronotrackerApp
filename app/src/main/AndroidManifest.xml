@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="unipr.luc_af.components.ChronoView$ChronoService"
+            android:name="unipr.luc_af.chronotracker.helpers.ChronoService"
             android:enabled="true"
             android:stopWithTask="false"/>
     </application>
