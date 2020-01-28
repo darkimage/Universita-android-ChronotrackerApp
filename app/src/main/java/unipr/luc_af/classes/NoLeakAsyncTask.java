@@ -82,8 +82,6 @@ public class NoLeakAsyncTask<I, P, R> extends AsyncTask<I, P, R> {
 
     public interface BackgroundTask<I, R> {
         R executeTask(I... is) throws Exception;
-
-        ;
     }
 
     public interface PostTask<R> {

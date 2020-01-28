@@ -45,23 +45,6 @@ public class Database {
         dbHelper.getWritableDatabase();
     }
 
-    public long addActivity(String name) throws SQLException {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        //Non c'e necessita di una transaction siccome stiamo eseguendo solamente una query di INSERT INTO nel caso
-        //fallisca viene generato un errore del tipo SQLException
-        ContentValues values = new ContentValues();
-        values.put(AppTables.ACTIVITY_TABLE_COL_0.getName(), name);
-        return db.insertOrThrow(AppTables.ACTIVITY_TABLE.getName(), null, values);
-    }
-
-    public long addActivityType(String name, long activity) throws SQLException {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(AppTables.ACTIVITY_TYPE_TABLE_COL_0.getName(), name);
-        values.put(AppTables.ACTIVITY_TYPE_TABLE_COL_1.getName(), activity);
-        return db.insertOrThrow(AppTables.ACTIVITY_TYPE_TABLE.getName(), null, values);
-    }
-
     public void addAthlete(Athlete athlete, DatabaseInsert result) {
         NoLeakAsyncTask<Void, Void, Long> task = new NoLeakAsyncTask<>(
                 mContext,

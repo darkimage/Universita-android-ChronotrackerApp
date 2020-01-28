@@ -4,5 +4,5 @@ import android.database.SQLException;
 
 @FunctionalInterface
 public interface DatabaseError {
-    public void OnError(SQLException exception);
+    void OnError(SQLException exception);
 }
