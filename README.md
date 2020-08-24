@@ -6,6 +6,8 @@ Strutturata per utilizzare tutte le tecniche di sviluppo mobile quali:
  - Utilizzo del pattern di programmazione **MVC (Model-View-Controller)** (che e' anche la base del Framework UI di Android)
  - Utilizzo della libreria [**Android Material**](https://material.io/develop/android/) per ottenere una UI moderna, responsiva e conforme alle specifiche del **Material Design**.
 
+l'applicazione realizza una app per il tracciamento e cronometraggio di atleti, mette a disposizione interfaccie per i profili degli altleti e la l 
+
 Traccia Progetto
 ---------------------
 
@@ -119,5 +121,6 @@ Costruttore numero 4, utilizzo che mostra la flessibilità di questa classe rapp
   <img width="625" height="528" src="https://github.com/darkimage/Universita-android-ChronotrackerApp/raw/master/documents/android_query_flow.jpg">
 </p>
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ2NzMyMTAwOCwtMTM0NTQ3NTE3Nl19
+eyJoaXN0b3J5IjpbNDQ1NDAyNjg4LC00NjczMjEwMDgsLTEzND
+U0NzUxNzZdfQ==
 -->
