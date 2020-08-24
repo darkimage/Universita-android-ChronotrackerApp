@@ -55,9 +55,7 @@ la sigla MVC sta per Model View Controller ovvero la sudivisione del codice in d
 
 Comunicazione tra Controllers
 -------------------------------------
-Per la comunicazione avviene tramite Observables (LiveData) ogni fragment registra e invia i dati utilizzando
-differenti Observables per definire differenti flussi di dati derivanti dalle azioni dell’utente o anche dal 
-recupero di dati dal Database 
+Per la comunicazione avviene tramite **Observables (LiveData)** ogni fragment registra e invia i dati utilizzandodifferenti Observables per definire differenti flussi di dati derivanti dalle azioni dell’utente o anche dal recupero di dati dal Database 
 
 **Esempio comunicazione toolbar:**
 
@@ -121,6 +119,5 @@ Costruttore numero 4, utilizzo che mostra la flessibilità di questa classe rapp
   <img width="625" height="528" src="https://github.com/darkimage/Universita-android-ChronotrackerApp/raw/master/documents/android_query_flow.jpg">
 </p>
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwODMwNjk2MTYsLTEzNDU0NzUxNzZdfQ
-==
+eyJoaXN0b3J5IjpbLTQ2NzMyMTAwOCwtMTM0NTQ3NTE3Nl19
 -->
