@@ -59,8 +59,11 @@ Per la comunicazione avviene tramite Observables (LiveData) ogni fragment regist
 differenti Observables per definire differenti flussi di dati derivanti dalle azioni dell’utente o anche dal 
 recupero di dati dal Database 
 
-Esampio comunicazione toolbar:
-![toolbar comunication](https://github.com/darkimage/Universita-android-ChronotrackerApp/raw/master/documents/Android_toolbar.jpg)
+**Esempio comunicazione toolbar:**
+
+<p align="center">
+  <img width="745" height="445" src="https://github.com/darkimage/Universita-android-ChronotrackerApp/raw/master/documents/Android_toolbar.jpg">
+</p>
 
 Implementazione Query Asincrone
 ------------------------------------------------
@@ -118,5 +121,6 @@ Costruttore numero 4, utilizzo che mostra la flessibilità di questa classe rapp
   <img width="625" height="528" src="https://github.com/darkimage/Universita-android-ChronotrackerApp/raw/master/documents/android_query_flow.jpg">
 </p>
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEzNDU0NzUxNzZdfQ==
+eyJoaXN0b3J5IjpbLTIwODMwNjk2MTYsLTEzNDU0NzUxNzZdfQ
+==
 -->
